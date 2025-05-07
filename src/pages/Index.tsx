@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import GenreExplorer from "@/components/GenreExplorer";
 import VenueCard from "@/components/VenueCard";
@@ -70,12 +71,16 @@ const Index = () => {
                 Discover nightlife venues that match your music taste, connect with like-minded people, and create unforgettable memories.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-primary hover:bg-primary/90">
-                  Get Started
-                </Button>
-                <Button size="lg" variant="outline">
-                  For Venues
-                </Button>
+                <Link to="/discover">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90">
+                    Get Started
+                  </Button>
+                </Link>
+                <Link to="/venues">
+                  <Button size="lg" variant="outline">
+                    For Venues
+                  </Button>
+                </Link>
               </div>
             </div>
             <div className="w-full md:w-1/2 flex justify-center">
@@ -110,7 +115,9 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Popular Venues</h2>
-            <Button variant="ghost" className="text-primary">View All</Button>
+            <Link to="/discover">
+              <Button variant="ghost" className="text-primary">View All</Button>
+            </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {venues.map((venue) => (
@@ -133,6 +140,9 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Find Venues Near You</h2>
+            <Link to="/map">
+              <Button variant="ghost" className="text-primary">Full Map View</Button>
+            </Link>
           </div>
           <MapView />
         </div>
