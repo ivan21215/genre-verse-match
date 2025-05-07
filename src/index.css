@@ -70,3 +70,77 @@
   border-radius: 12px;
   overflow: hidden;
 }
+
+/* New Croatian genre colors */
+.bg-genre-cajke {
+  background-color: #e53935; /* Red for Cajke */
+  color: white;
+}
+
+.bg-genre-trash {
+  background-color: #8e24aa; /* Purple for Trash */
+  color: white;
+}
+
+/* Keep existing genre colors */
+.bg-genre-electronic {
+  background-color: #3a86ff;
+  color: white;
+}
+
+.bg-genre-hiphop {
+  background-color: #ff006e;
+  color: white;
+}
+
+.bg-genre-rock {
+  background-color: #8338ec;
+  color: white;
+}
+
+.bg-genre-pop {
+  background-color: #fb5607;
+  color: white;
+}
+
+.bg-genre-jazz {
+  background-color: #ffbe0b;
+  color: black;
+}
+
+.bg-genre-rnb {
+  background-color: #06d6a0;
+  color: white;
+}
+
+.bg-genre-techno {
+  background-color: #118ab2;
+  color: white;
+}
+
+.bg-genre-house {
+  background-color: #073b4c;
+  color: white;
+}
+
+/* Pulse animation for inactivity hint */
+@keyframes pulse-border {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+.pulse-border {
+  animation: pulse-border 2s infinite;
+}
+
+/* Gradient overlay for venue cards */
+.bg-gradient-venue {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%);
+}
