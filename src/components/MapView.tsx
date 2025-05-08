@@ -20,7 +20,11 @@ const MapView: React.FC<MapViewProps> = ({ selectedGenre = "All" }) => {
     <div className="relative w-full h-full rounded-xl overflow-hidden shadow-lg">
       {isLoading && <LoadingIndicator />}
 
-      <MapFrame userLocation={userLocation} />
+      <MapFrame 
+        userLocation={userLocation} 
+        venues={venues} 
+        selectedGenre={selectedGenre}
+      />
       
       {/* Venue list below the map */}
       <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm p-4">
