@@ -17,17 +17,17 @@ const Venues = () => {
   const [venueLoggedIn, setVenueLoggedIn] = useState(false);
   const [venueCode, setVenueCode] = useState("");
   
-  // Sample genre popularity data
+  // Sample genre popularity data with correctly typed trends
   const genrePopularityData = [
-    { genre: "Techno", count: 342, trend: "up" },
-    { genre: "Hip Hop", count: 289, trend: "up" },
-    { genre: "Rock", count: 187, trend: "down" },
-    { genre: "Cajke", count: 256, trend: "up" },
-    { genre: "Trash", count: 201, trend: "stable" },
-    { genre: "White Girl Music", count: 312, trend: "up" },
-    { genre: "Dance", count: 178, trend: "down" },
-    { genre: "Jazz", count: 98, trend: "stable" },
-    { genre: "Rap", count: 276, trend: "up" },
+    { genre: "Techno", count: 342, trend: "up" as const },
+    { genre: "Hip Hop", count: 289, trend: "up" as const },
+    { genre: "Rock", count: 187, trend: "down" as const },
+    { genre: "Cajke", count: 256, trend: "up" as const },
+    { genre: "Trash", count: 201, trend: "stable" as const },
+    { genre: "White Girl Music", count: 312, trend: "up" as const },
+    { genre: "Dance", count: 178, trend: "down" as const },
+    { genre: "Jazz", count: 98, trend: "stable" as const },
+    { genre: "Rap", count: 276, trend: "up" as const },
   ];
 
   const handleLogin = () => {

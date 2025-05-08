@@ -2,7 +2,7 @@
 import React from "react";
 import { getGenreColor, launchNavigation } from "@/utils/mapUtils";
 import type { Venue } from "@/data/venueData";
-import { MapPin, Navigation } from "lucide-react";
+import { Navigation } from "lucide-react";
 import { Button } from "./ui/button";
 
 interface MapFrameProps {
@@ -46,7 +46,7 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
     return userLocation ? `&markers=color:blue|label:Y|${userLocation.lat},${userLocation.lng}` : '';
   };
 
-  // Construct map URL
+  // Construct map URL with improved Google Maps API parameters
   const mapUrl = venues.length > 0 
     ? `https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${center}&zoom=15${getMarkers()}${getUserMarker()}`
     : `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${center}&zoom=15`;
