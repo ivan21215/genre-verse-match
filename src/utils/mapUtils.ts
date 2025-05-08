@@ -1,31 +1,29 @@
 
-// Utility functions for the map
+// Map utility functions
 
+// Color utility to get a color for each genre
 export const getGenreColor = (genre: string): string => {
-  switch(genre.toLowerCase()) {
-    case 'cajke': return '#FF5733';
-    case 'trash': return '#8e24aa';
-    case 'white girl music': return '#fb5607';
-    case 'techno': return '#118ab2';
-    case 'hip hop': return '#ff006e';
-    case 'rock': return '#8338ec';
-    case 'rap': return '#f97316';
-    case 'dance': return '#ec4899';
-    case 'jazz': return '#f59e0b';
-    default: return '#7733FF';
-  }
+  const genreColors: Record<string, string> = {
+    'Techno': '#ff6b6b',
+    'Hip Hop': '#48dbfb',
+    'Rock': '#ff9f43',
+    'Jazz': '#1dd1a1',
+    'Pop': '#54a0ff',
+    'R&B': '#5f27cd',
+    'Dance': '#00d2d3',
+    'Rap': '#8854d0',
+    'Cajke': '#ee5253',
+    'Trash': '#2e86de', 
+    'White Girl Music': '#ff9ff3',
+    // Default color for any other genres
+    'default': '#576574'
+  };
+
+  return genreColors[genre] || genreColors.default;
 };
 
-export const getGoogleMapsUrl = (center: string): string => {
-  return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${center}&zoom=15`;
-};
-
+// Launch navigation to a destination
 export const launchNavigation = (lat: number, lng: number): void => {
-  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-  window.open(mapUrl, '_blank');
-  
-  // Add vibration feedback if supported
-  if (navigator.vibrate) {
-    navigator.vibrate(200);
-  }
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  window.open(url, '_blank');
 };
