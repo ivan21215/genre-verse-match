@@ -4,13 +4,19 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MapView from "@/components/MapView";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Music, Disc, Headphones, Radio, Mic, Guitar } from "lucide-react";
 
 const Map = () => {
   const [selectedGenre, setSelectedGenre] = useState<string>("All");
+  const [venueType, setVenueType] = useState<"All" | "Venue" | "Club">("All");
 
   const handleGenreChange = (genre: string) => {
     setSelectedGenre(genre);
+  };
+
+  const handleTypeChange = (type: "All" | "Venue" | "Club") => {
+    setVenueType(type);
   };
 
   return (
@@ -18,8 +24,18 @@ const Map = () => {
       <Header />
       
       <div className="container mx-auto pt-24 pb-12 px-4 flex-grow">
-        <h1 className="text-3xl font-bold mb-4">Find Venues Near You</h1>
+        <h1 className="text-3xl font-bold mb-4">Find Venues & Clubs Near You</h1>
         
+        <div className="mb-4">
+          <Tabs defaultValue="All" onValueChange={(v) => handleTypeChange(v as "All" | "Venue" | "Club")}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="All">All</TabsTrigger>
+              <TabsTrigger value="Venue">Venues</TabsTrigger>
+              <TabsTrigger value="Club">Clubs</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
         <div className="mb-6 overflow-x-auto pb-2">
           <ToggleGroup type="single" value={selectedGenre} onValueChange={(value) => value && handleGenreChange(value)} className="flex space-x-2">
             <ToggleGroupItem value="All" className="whitespace-nowrap">All Genres</ToggleGroupItem>
@@ -36,7 +52,7 @@ const Map = () => {
         </div>
         
         <div className="h-[600px] md:h-[700px] relative rounded-xl overflow-hidden">
-          <MapView selectedGenre={selectedGenre} />
+          <MapView selectedGenre={selectedGenre} venueType={venueType} />
         </div>
       </div>
       

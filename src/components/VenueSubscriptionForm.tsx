@@ -10,21 +10,23 @@ import { useToast } from "@/hooks/use-toast";
 
 interface VenueSubscriptionFormProps {
   onClose: () => void;
+  businessType: "venue" | "club";
 }
 
 // Function to generate a random venue code
-const generateVenueCode = (venueName: string): string => {
-  const prefix = venueName.slice(0, 3).toUpperCase();
+const generateVenueCode = (name: string, businessType: string): string => {
+  const prefix = name.slice(0, 3).toUpperCase();
   const randomNumbers = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
   const month = new Date().getMonth() + 1;
   const year = new Date().getFullYear();
-  return `${prefix}-${randomNumbers}-${month}${year}`;
+  const type = businessType === "club" ? "C" : "V";
+  return `${type}-${prefix}-${randomNumbers}-${month}${year}`;
 };
 
-const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose }) => {
+const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose, businessType }) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    venueName: "",
+    name: "",
     address: "",
     contactEmail: "",
     contactPhone: "",
@@ -49,14 +51,14 @@ const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose }
     e.preventDefault();
     
     // Generate a unique venue code valid for one month
-    const code = generateVenueCode(formData.venueName);
+    const code = generateVenueCode(formData.name, businessType);
     setVenueCode(code);
     setIsSubmitted(true);
     
     // Simulate subscription process
     toast({
       title: "Payment Successful",
-      description: "Your venue subscription has been processed.",
+      description: `Your ${businessType} subscription has been processed.`,
     });
   };
 
@@ -64,9 +66,11 @@ const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose }
     navigator.clipboard.writeText(venueCode);
     toast({
       title: "Code Copied",
-      description: "Venue code has been copied to clipboard.",
+      description: `${businessType === 'club' ? 'Club' : 'Venue'} code has been copied to clipboard.`,
     });
   };
+
+  const businessTypeName = businessType === 'club' ? 'Club' : 'Venue';
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -74,19 +78,19 @@ const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose }
         {!isSubmitted ? (
           <>
             <DialogHeader>
-              <DialogTitle>Subscribe as a Venue</DialogTitle>
+              <DialogTitle>Subscribe as a {businessTypeName}</DialogTitle>
               <DialogDescription>
-                Fill out this form to list your venue and gain access to the dashboard
+                Fill out this form to list your {businessType} and gain access to the dashboard
               </DialogDescription>
             </DialogHeader>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="venueName">Venue Name</Label>
+                <Label htmlFor="name">{businessTypeName} Name</Label>
                 <Input
-                  id="venueName"
-                  name="venueName"
-                  value={formData.venueName}
+                  id="name"
+                  name="name"
+                  value={formData.name}
                   onChange={handleInputChange}
                   required
                 />
@@ -218,13 +222,13 @@ const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose }
             <DialogHeader>
               <DialogTitle>Subscription Successful</DialogTitle>
               <DialogDescription>
-                Your venue has been registered successfully. Use the code below to access your dashboard.
+                Your {businessType} has been registered successfully. Use the code below to access your dashboard.
               </DialogDescription>
             </DialogHeader>
 
             <div className="py-6">
               <div className="bg-muted p-4 rounded-md mb-4">
-                <div className="text-sm text-muted-foreground mb-1">Your Venue Code (valid for 1 month):</div>
+                <div className="text-sm text-muted-foreground mb-1">Your {businessTypeName} Code (valid for 1 month):</div>
                 <div className="flex items-center justify-between">
                   <code className="bg-background px-2 py-1 rounded text-lg font-mono">{venueCode}</code>
                   <Button size="sm" variant="outline" onClick={copyCodeToClipboard}>
@@ -252,7 +256,7 @@ const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose }
               </div>
               
               <p className="text-sm text-muted-foreground mb-4">
-                This code allows you to log in to the venue dashboard for 30 days. 
+                This code allows you to log in to the {businessType} dashboard for 30 days. 
                 Your subscription will automatically renew monthly.
               </p>
             </div>

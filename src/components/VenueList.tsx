@@ -27,7 +27,7 @@ const VenueList: React.FC<VenueListProps> = ({ venues, selectedGenre }) => {
     <div className="space-y-2 max-h-40 overflow-y-auto">
       {venues.length === 0 ? (
         <div className="p-2 text-sm text-center">
-          No venues found for this genre nearby. Try another genre!
+          No venues or clubs found for this genre nearby. Try another genre!
         </div>
       ) : (
         venues.map((venue) => (
@@ -38,7 +38,9 @@ const VenueList: React.FC<VenueListProps> = ({ venues, selectedGenre }) => {
           >
             <div>
               <div className="font-medium">{venue.name}</div>
-              <div className="text-xs text-muted-foreground">{venue.genre} • {venue.distance}</div>
+              <div className="text-xs text-muted-foreground">
+                {venue.genre} • {venue.distance} • {venue.type}
+              </div>
             </div>
             <Button 
               size="sm" 

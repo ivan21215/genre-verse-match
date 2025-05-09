@@ -11,12 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import VenueSubscriptionForm from "@/components/VenueSubscriptionForm";
 import VenueEventManager from "@/components/VenueEventManager";
 import GenrePopularityStats from "@/components/GenrePopularityStats";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Venues = () => {
   const [showSubscriptionForm, setShowSubscriptionForm] = useState(false);
   const [venueLoggedIn, setVenueLoggedIn] = useState(false);
   const [venueCode, setVenueCode] = useState("");
   const [subscriptionPlan, setSubscriptionPlan] = useState<"standard" | "premium">("standard");
+  const [businessType, setBusinessType] = useState<"venue" | "club">("venue");
   
   // Sample genre popularity data with correctly typed trends
   const genrePopularityData = [
@@ -50,22 +52,22 @@ const Venues = () => {
       <Header />
       
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">For Venues</h1>
+        <h1 className="text-3xl font-bold mb-6">For Venues & Clubs</h1>
         
         {!venueLoggedIn ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card>
               <CardHeader>
-                <CardTitle>Venue Login</CardTitle>
+                <CardTitle>Venue/Club Login</CardTitle>
                 <CardDescription>
-                  Enter your venue code to access your dashboard
+                  Enter your code to access your dashboard
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
                     <Input 
-                      placeholder="Enter your venue code" 
+                      placeholder="Enter your venue/club code" 
                       value={venueCode}
                       onChange={(e) => setVenueCode(e.target.value)}
                     />
@@ -79,11 +81,18 @@ const Venues = () => {
               <CardHeader>
                 <CardTitle>Join the Network</CardTitle>
                 <CardDescription>
-                  List your venue and reach more customers
+                  List your venue or club and reach more customers
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
+                  <Tabs defaultValue="venue" className="w-full mb-4">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="venue" onClick={() => setBusinessType("venue")}>Venue</TabsTrigger>
+                      <TabsTrigger value="club" onClick={() => setBusinessType("club")}>Club</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  
                   <div className="grid grid-cols-2 gap-4">
                     <div className="border rounded-md p-4 hover:border-primary transition-colors">
                       <div className="font-bold mb-1">Standard Plan</div>
@@ -127,7 +136,9 @@ const Venues = () => {
           <div className="space-y-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
-                <h2 className="text-2xl font-bold">Club Venue Dashboard</h2>
+                <h2 className="text-2xl font-bold">
+                  {businessType === "club" ? "Club Dashboard" : "Venue Dashboard"}
+                </h2>
                 <p className="text-muted-foreground">Manage your events and see genre analytics</p>
               </div>
               <div className="flex items-center gap-2">
@@ -179,7 +190,10 @@ const Venues = () => {
         )}
         
         {showSubscriptionForm && (
-          <VenueSubscriptionForm onClose={() => setShowSubscriptionForm(false)} />
+          <VenueSubscriptionForm 
+            onClose={() => setShowSubscriptionForm(false)} 
+            businessType={businessType}
+          />
         )}
       </main>
       
