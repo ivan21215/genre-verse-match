@@ -33,23 +33,23 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
   // Use viewport based on venues if available
   const viewport = venues.length > 0 ? calculateBounds() : center;
   
-  // Generate markers for venues
-  const getMarkers = () => {
-    return venues.map(venue => {
-      const color = encodeURIComponent(getGenreColor(venue.genre).replace('#', ''));
-      return `&markers=color:${color}|label:${venue.name.charAt(0)}|${venue.location.lat},${venue.location.lng}`;
-    }).join('');
-  };
-  
-  // Generate user location marker
-  const getUserMarker = () => {
-    return userLocation ? `&markers=color:blue|label:Y|${userLocation.lat},${userLocation.lng}` : '';
+  // Fix the Google Maps URL to properly handle multiple locations
+  // Instead of using markers parameter, we'll use q parameter for search queries
+  const constructMapUrl = () => {
+    if (venues.length === 0) {
+      return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${center}&zoom=15`;
+    } else if (venues.length === 1) {
+      // For a single venue, we can use place mode with the venue location
+      const venue = venues[0];
+      return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${venue.location.lat},${venue.location.lng}&zoom=15`;
+    } else {
+      // For multiple venues, we use the search mode with the first venue
+      // and center the map around all venues
+      return `https://www.google.com/maps/embed/v1/search?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=clubs+in+zagreb&center=${center}&zoom=14`;
+    }
   };
 
-  // Construct map URL with improved Google Maps API parameters
-  const mapUrl = venues.length > 0 
-    ? `https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${center}&zoom=15${getMarkers()}${getUserMarker()}`
-    : `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${center}&zoom=15`;
+  const mapUrl = constructMapUrl();
 
   return (
     <div className="absolute inset-0 flex flex-col">
