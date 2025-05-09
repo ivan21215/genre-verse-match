@@ -15,12 +15,20 @@ export const useLocation = (): LocationHookReturn => {
   useEffect(() => {
     if (navigator.geolocation) {
       setIsLoading(true);
+      
+      // Add timeout handling to wait properly for geolocation
+      const timeoutId = setTimeout(() => {
+        console.log("Geolocation is taking too long, but still waiting...");
+      }, 5000);
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          clearTimeout(timeoutId);
           const userPos = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
+          console.log("Got user location:", userPos);
           setUserLocation(userPos);
           setIsLoading(false);
           
@@ -30,6 +38,7 @@ export const useLocation = (): LocationHookReturn => {
           });
         },
         (error) => {
+          clearTimeout(timeoutId);
           console.error("Error getting location:", error);
           setIsLoading(false);
           
@@ -41,6 +50,12 @@ export const useLocation = (): LocationHookReturn => {
             description: "We're using a default location. Please enable location services for better results.",
             variant: "destructive"
           });
+        },
+        {
+          // Geolocation options - higher accuracy and longer timeout
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
         }
       );
     } else {

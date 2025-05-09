@@ -1,10 +1,11 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { getVenuesByGenreAndType } from "@/data/venueData";
 import useLocation from "@/hooks/useLocation";
 import LoadingIndicator from "@/components/LoadingIndicator";
 import MapFrame from "@/components/MapFrame";
 import VenueList from "@/components/VenueList";
+import type { Venue } from "@/data/venueData";
 
 interface MapViewProps {
   selectedGenre?: string;
@@ -16,9 +17,20 @@ const MapView: React.FC<MapViewProps> = ({
   venueType = "All"
 }) => {
   const { userLocation, isLoading } = useLocation();
+  const [nearbyVenues, setNearbyVenues] = useState<Venue[]>([]);
   
   // Get venues filtered by selected genre and type
   const venues = getVenuesByGenreAndType(selectedGenre, venueType);
+  
+  // When user location or venues change, update the list of nearby venues
+  useEffect(() => {
+    if (userLocation) {
+      // In a real app, we would calculate actual distances here
+      // For now, we're just using the mock distances in the data
+      console.log("User location updated:", userLocation);
+      setNearbyVenues(venues);
+    }
+  }, [userLocation, venues]);
   
   return (
     <div className="relative w-full h-full rounded-xl overflow-hidden shadow-lg">
@@ -26,7 +38,7 @@ const MapView: React.FC<MapViewProps> = ({
 
       <MapFrame 
         userLocation={userLocation} 
-        venues={venues} 
+        venues={nearbyVenues} 
         selectedGenre={selectedGenre}
       />
       
@@ -41,7 +53,7 @@ const MapView: React.FC<MapViewProps> = ({
                 ? `${selectedGenre} Venues & Clubs Near You:`
                 : `${selectedGenre} ${venueType === "Club" ? "Clubs" : "Venues"} Near You:`}
         </div>
-        <VenueList venues={venues} selectedGenre={selectedGenre} />
+        <VenueList venues={nearbyVenues} selectedGenre={selectedGenre} />
       </div>
     </div>
   );
