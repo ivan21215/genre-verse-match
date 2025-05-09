@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CreditCard, Copy } from "lucide-react";
+import { CreditCard, Copy, Calendar, ChartBar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface VenueSubscriptionFormProps {
@@ -136,14 +136,25 @@ const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose }
                 >
                   <div className="flex items-center space-x-2 rounded-md border p-3">
                     <RadioGroupItem value="standard" id="standard" />
-                    <Label htmlFor="standard" className="flex-grow font-medium">
-                      Standard Plan - $49.99/month
+                    <Label htmlFor="standard" className="flex-grow">
+                      <div className="font-medium">Standard Plan - $49.99/month</div>
+                      <div className="text-sm text-muted-foreground flex items-center mt-1">
+                        <Calendar className="h-4 w-4 mr-1" /> Post events to calendar
+                      </div>
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2 rounded-md border p-3">
                     <RadioGroupItem value="premium" id="premium" />
-                    <Label htmlFor="premium" className="flex-grow font-medium">
-                      Premium Plan - $99.99/month
+                    <Label htmlFor="premium" className="flex-grow">
+                      <div className="font-medium">Premium Plan - $99.99/month</div>
+                      <div className="text-sm text-muted-foreground flex flex-col gap-1 mt-1">
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" /> Post events to calendar
+                        </div>
+                        <div className="flex items-center">
+                          <ChartBar className="h-4 w-4 mr-1" /> Access genre popularity analytics
+                        </div>
+                      </div>
                     </Label>
                   </div>
                 </RadioGroup>
@@ -220,6 +231,24 @@ const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose }
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>
+              </div>
+              
+              <div className="bg-muted/50 p-4 rounded-md mb-4">
+                <div className="font-medium mb-2">
+                  {formData.plan === "standard" ? "Standard Plan Features:" : "Premium Plan Features:"}
+                </div>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white mr-2">✓</div>
+                    Post events to the event calendar
+                  </li>
+                  {formData.plan === "premium" && (
+                    <li className="flex items-center">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white mr-2">✓</div>
+                      Access to genre popularity analytics
+                    </li>
+                  )}
+                </ul>
               </div>
               
               <p className="text-sm text-muted-foreground mb-4">

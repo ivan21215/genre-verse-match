@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, CreditCard } from "lucide-react";
+import { Calendar, CreditCard, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import VenueSubscriptionForm from "@/components/VenueSubscriptionForm";
 import VenueEventManager from "@/components/VenueEventManager";
@@ -16,6 +16,7 @@ const Venues = () => {
   const [showSubscriptionForm, setShowSubscriptionForm] = useState(false);
   const [venueLoggedIn, setVenueLoggedIn] = useState(false);
   const [venueCode, setVenueCode] = useState("");
+  const [subscriptionPlan, setSubscriptionPlan] = useState<"standard" | "premium">("standard");
   
   // Sample genre popularity data with correctly typed trends
   const genrePopularityData = [
@@ -33,6 +34,14 @@ const Venues = () => {
   const handleLogin = () => {
     if (venueCode.trim() !== "") {
       setVenueLoggedIn(true);
+      
+      // Determine subscription plan from venue code (in a real app, this would be validated server-side)
+      // For this example, we'll assume codes containing "PRE" are premium
+      if (venueCode.includes("PRE")) {
+        setSubscriptionPlan("premium");
+      } else {
+        setSubscriptionPlan("standard");
+      }
     }
   };
 
@@ -75,24 +84,32 @@ const Venues = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-sm">✓</div>
-                      <span>Reach more customers interested in your genre</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-sm">✓</div>
-                      <span>Promote your events to targeted audience</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-sm">✓</div>
-                      <span>Get insights on trending music genres</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-sm">✓</div>
-                      <span>Simple monthly subscription</span>
-                    </li>
-                  </ul>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="border rounded-md p-4 hover:border-primary transition-colors">
+                      <div className="font-bold mb-1">Standard Plan</div>
+                      <div className="text-2xl font-bold mb-2">$49.99<span className="text-sm font-normal text-muted-foreground">/month</span></div>
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[10px] text-white">✓</div>
+                          <span>Post events to calendar</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="border rounded-md p-4 bg-muted/20 hover:border-primary transition-colors">
+                      <div className="font-bold mb-1">Premium Plan</div>
+                      <div className="text-2xl font-bold mb-2">$99.99<span className="text-sm font-normal text-muted-foreground">/month</span></div>
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[10px] text-white">✓</div>
+                          <span>Post events to calendar</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[10px] text-white">✓</div>
+                          <span>Genre popularity analytics</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
@@ -114,7 +131,9 @@ const Venues = () => {
                 <p className="text-muted-foreground">Manage your events and see genre analytics</p>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className="bg-green-500">Subscription Active</Badge>
+                <Badge className={subscriptionPlan === "premium" ? "bg-purple-500" : "bg-green-500"}>
+                  {subscriptionPlan === "premium" ? "Premium Plan" : "Standard Plan"}
+                </Badge>
                 <Button variant="outline" size="sm">Manage Subscription</Button>
                 <Button variant="ghost" size="sm" onClick={() => setVenueLoggedIn(false)}>Logout</Button>
               </div>
@@ -139,7 +158,20 @@ const Venues = () => {
                   <CardDescription>Weekly trends based on user preferences</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <GenrePopularityStats data={genrePopularityData} />
+                  {subscriptionPlan === "premium" ? (
+                    <GenrePopularityStats data={genrePopularityData} />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <Lock className="h-12 w-12 text-muted-foreground mb-4" />
+                      <h3 className="font-medium text-lg mb-2">Premium Feature</h3>
+                      <p className="text-sm text-center text-muted-foreground mb-4">
+                        Upgrade to Premium to see detailed genre analytics
+                      </p>
+                      <Button variant="outline" size="sm">
+                        Upgrade Now
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

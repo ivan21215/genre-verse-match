@@ -34,18 +34,18 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
   const viewport = venues.length > 0 ? calculateBounds() : center;
   
   // Fix the Google Maps URL to properly handle multiple locations
-  // Instead of using markers parameter, we'll use q parameter for search queries
   const constructMapUrl = () => {
     if (venues.length === 0) {
+      // Just show the user's location
       return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${center}&zoom=15`;
     } else if (venues.length === 1) {
-      // For a single venue, we can use place mode with the venue location
+      // For a single venue, use place mode with the venue location and add a marker for user location
       const venue = venues[0];
-      return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${venue.location.lat},${venue.location.lng}&zoom=15`;
+      return `https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${venue.location.lat},${venue.location.lng}&zoom=15`;
     } else {
-      // For multiple venues, we use the search mode with the first venue
-      // and center the map around all venues
-      return `https://www.google.com/maps/embed/v1/search?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=clubs+in+zagreb&center=${center}&zoom=14`;
+      // For multiple venues, center the map to fit all locations
+      const centerPoint = userLocation ? center : `${venues[0].location.lat},${venues[0].location.lng}`;
+      return `https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${centerPoint}&zoom=14`;
     }
   };
 
@@ -63,6 +63,16 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
           allowFullScreen
           src={mapUrl}
         ></iframe>
+        
+        {/* User location indicator */}
+        {userLocation && (
+          <div className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm p-2 rounded shadow-md text-sm">
+            <div className="font-medium text-primary">Your Location</div>
+            <div className="text-xs text-muted-foreground">
+              {userLocation.lat.toFixed(6)}, {userLocation.lng.toFixed(6)}
+            </div>
+          </div>
+        )}
         
         {/* Navigation control */}
         <div className="absolute bottom-4 right-4 z-10">
