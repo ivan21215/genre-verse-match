@@ -71,6 +71,16 @@ const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose, 
   };
 
   const businessTypeName = businessType === 'club' ? 'Club' : 'Venue';
+  
+  // Check if the form has all required fields filled
+  const isFormComplete = 
+    formData.name.trim() !== "" && 
+    formData.address.trim() !== "" && 
+    formData.contactEmail.trim() !== "" && 
+    formData.contactPhone.trim() !== "" && 
+    formData.cardNumber.trim() !== "" && 
+    formData.cardExpiry.trim() !== "" && 
+    formData.cardCvc.trim() !== "";
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -210,9 +220,12 @@ const VenueSubscriptionForm: React.FC<VenueSubscriptionFormProps> = ({ onClose, 
                 <Button type="button" variant="outline" onClick={onClose}>
                   Cancel
                 </Button>
-                <Button type="submit">
+                <Button 
+                  type="submit" 
+                  disabled={!isFormComplete}
+                >
                   <CreditCard className="mr-2 h-4 w-4" />
-                  Subscribe Now
+                  {formData.plan === "standard" ? "Pay $49.99" : "Pay $99.99"}
                 </Button>
               </DialogFooter>
             </form>
