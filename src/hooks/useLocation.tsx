@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Geolocation } from '@capacitor/geolocation';
+import { Capacitor } from '@capacitor/core';
 
 interface LocationHookReturn {
   userLocation: { lat: number; lng: number } | null;
@@ -64,10 +65,8 @@ export const useLocation = (): LocationHookReturn => {
       }
     };
 
-    // Check if we're running in a Capacitor environment
-    const hasCapacitor = typeof window !== 'undefined' && 
-                        window.Capacitor !== undefined && 
-                        window.Capacitor.isNativePlatform();
+    // Check if we're running in a Capacitor environment using the proper import
+    const hasCapacitor = Capacitor.isNativePlatform();
     
     if (hasCapacitor) {
       console.log("Using Capacitor geolocation");
