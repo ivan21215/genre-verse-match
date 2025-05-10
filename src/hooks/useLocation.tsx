@@ -18,12 +18,21 @@ export const useLocation = (): LocationHookReturn => {
       try {
         setIsLoading(true);
         
-        // Request permissions first (required for iOS)
-        await Geolocation.requestPermissions();
+        // Check permission status first
+        const permissionStatus = await Geolocation.checkPermissions();
+        
+        if (permissionStatus.location !== 'granted') {
+          // Request permissions explicitly
+          const requestResult = await Geolocation.requestPermissions();
+          
+          if (requestResult.location !== 'granted') {
+            throw new Error("Location permission denied");
+          }
+        }
         
         const position = await Geolocation.getCurrentPosition({
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 30000, // Increased timeout for better chance of success
           maximumAge: 0
         });
         
@@ -56,12 +65,15 @@ export const useLocation = (): LocationHookReturn => {
     };
 
     // Check if we're running in a Capacitor environment
-    // Using typeof to safely check for the Capacitor global
-    const hasCapacitor = typeof window !== 'undefined' && !!(window as any).Capacitor;
+    const hasCapacitor = typeof window !== 'undefined' && 
+                        window.Capacitor !== undefined && 
+                        window.Capacitor.isNativePlatform();
     
     if (hasCapacitor) {
+      console.log("Using Capacitor geolocation");
       getLocationCapacitor();
     } else {
+      console.log("Using browser geolocation");
       // Fallback to browser geolocation
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -94,7 +106,7 @@ export const useLocation = (): LocationHookReturn => {
           },
           {
             enableHighAccuracy: true,
-            timeout: 10000,
+            timeout: 30000, // Increased timeout
             maximumAge: 0
           }
         );

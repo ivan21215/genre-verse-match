@@ -11,7 +11,16 @@ const config: CapacitorConfig = {
   },
   plugins: {
     Geolocation: {
-      includePermissionRequests: true
+      includePermissionRequests: true,
+      permissions: {
+        android: {
+          locationAccuracy: "high",
+          locationWhenInUse: "true"
+        },
+        ios: {
+          locationWhenInUse: "This app needs your location to find venues near you"
+        }
+      }
     }
   }
 };

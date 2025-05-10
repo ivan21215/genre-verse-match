@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import type { Venue } from "@/data/venueData";
 import { getGenreColor, launchNavigation } from "@/utils/mapUtils";
-import { Navigation } from "lucide-react";
+import { Navigation, MapPin, RefreshCcw } from "lucide-react";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -16,12 +16,14 @@ interface MapFrameProps {
 const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre }) => {
   const { toast } = useToast();
   const [mapUrl, setMapUrl] = useState<string>("");
+  const [mapError, setMapError] = useState(false);
   const isMobile = useIsMobile();
   
   useEffect(() => {
     // Only update map when we have user location
     if (userLocation) {
       constructMapUrl();
+      setMapError(false);
     }
   }, [userLocation, venues, selectedGenre]);
   
@@ -47,10 +49,15 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
     return venues[0];
   };
 
+  const handleRetryMap = () => {
+    setMapError(false);
+    constructMapUrl();
+  };
+
   return (
     <div className="absolute inset-0 flex flex-col">
       <div className="relative flex-grow">
-        {mapUrl && (
+        {mapUrl && !mapError && (
           <iframe
             title="Google Map"
             width="100%"
@@ -59,11 +66,24 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
             loading="lazy"
             allowFullScreen
             src={mapUrl}
+            onError={() => setMapError(true)}
           ></iframe>
         )}
         
+        {mapError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+            <div className="text-center space-y-4">
+              <MapPin className="h-12 w-12 text-primary mx-auto" />
+              <p className="text-lg font-medium">Unable to load map</p>
+              <Button onClick={handleRetryMap} variant="outline" className="gap-2">
+                <RefreshCcw className="h-4 w-4" /> Retry
+              </Button>
+            </div>
+          </div>
+        )}
+        
         {/* User location indicator - optimized for mobile */}
-        {userLocation && (
+        {userLocation && !mapError && (
           <div className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm p-2 rounded shadow-md text-sm z-10">
             <div className="font-medium text-primary">Your Location</div>
             <div className="text-xs text-muted-foreground">
@@ -73,7 +93,7 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
         )}
         
         {/* Mobile-optimized navigation control */}
-        {venues.length > 0 && (
+        {venues.length > 0 && !mapError && (
           <div className={`absolute ${isMobile ? 'bottom-16' : 'bottom-4'} right-4 z-10`}>
             <Button 
               variant="default"

@@ -1,7 +1,6 @@
 
 import React, { useState } from "react";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import MapView from "@/components/MapView";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -55,8 +54,6 @@ const Map = () => {
           <MapView selectedGenre={selectedGenre} venueType={venueType} />
         </div>
       </div>
-      
-      <Footer />
     </div>
   );
 };
