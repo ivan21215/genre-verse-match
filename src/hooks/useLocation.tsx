@@ -54,9 +54,12 @@ export const useLocation = (): LocationHookReturn => {
         });
       }
     };
+
+    // Check if we're running in a Capacitor environment
+    // Using typeof to safely check for the Capacitor global
+    const hasCapacitor = typeof window !== 'undefined' && !!(window as any).Capacitor;
     
-    // Try to use Capacitor Geolocation
-    if (window.Capacitor) {
+    if (hasCapacitor) {
       getLocationCapacitor();
     } else {
       // Fallback to browser geolocation

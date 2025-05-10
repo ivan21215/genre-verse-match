@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import type { Venue } from "@/data/venueData";
 import { getGenreColor, launchNavigation } from "@/utils/mapUtils";
-import { Navigation, MapPin } from "lucide-react";
+import { Navigation } from "lucide-react";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -25,16 +25,15 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
     }
   }, [userLocation, venues, selectedGenre]);
   
-  // Fix the Google Maps URL to properly handle location visualization
+  // Fix the Google Maps URL to properly center the map on user's location
   const constructMapUrl = () => {
-    if (!userLocation) {
-      return;
-    }
+    if (!userLocation) return;
     
     // Use a simpler approach that just centers the map on the user's location
     const center = `${userLocation.lat},${userLocation.lng}`;
     const zoom = 14; // Appropriate zoom level to see nearby venues
     
+    // Use Google Maps embed API with the correct format for center parameter
     const url = `https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${center}&zoom=${zoom}`;
     setMapUrl(url);
   };
