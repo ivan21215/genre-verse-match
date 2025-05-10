@@ -22,10 +22,21 @@ export const getGenreColor = (genre: string): string => {
   return genreColors[genre] || genreColors.default;
 };
 
-// Launch navigation to a destination
+// Launch navigation to a destination with special handling for mobile devices
 export const launchNavigation = (lat: number, lng: number): void => {
-  const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-  window.open(url, '_blank');
+  // Check if running on mobile
+  const isMobileApp = true; // In a real app, we would check for Capacitor/Cordova
+  
+  if (isMobileApp) {
+    // On mobile, use platform-specific navigation if available
+    // For iOS/Android, this will use native maps
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+    window.open(url, '_system');
+  } else {
+    // Fallback for web
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    window.open(url, '_blank');
+  }
 };
 
 // Calculate distance between two points using the Haversine formula

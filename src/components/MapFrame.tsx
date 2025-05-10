@@ -5,6 +5,7 @@ import { getGenreColor, launchNavigation } from "@/utils/mapUtils";
 import { Navigation, MapPin } from "lucide-react";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MapFrameProps {
   userLocation: { lat: number; lng: number } | null;
@@ -15,9 +16,10 @@ interface MapFrameProps {
 const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre }) => {
   const { toast } = useToast();
   const [mapUrl, setMapUrl] = useState<string>("");
-
+  const isMobile = useIsMobile();
+  
   useEffect(() => {
-    // Only update map when we have user location or venues
+    // Only update map when we have user location
     if (userLocation) {
       constructMapUrl();
     }
@@ -29,8 +31,7 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
       return;
     }
     
-    // Since Google Maps Embed API doesn't support multiple markers in the way we tried,
-    // we'll use a simpler approach that just centers the map on the user's location
+    // Use a simpler approach that just centers the map on the user's location
     const center = `${userLocation.lat},${userLocation.lng}`;
     const zoom = 14; // Appropriate zoom level to see nearby venues
     
@@ -62,7 +63,7 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
           ></iframe>
         )}
         
-        {/* User location indicator */}
+        {/* User location indicator - optimized for mobile */}
         {userLocation && (
           <div className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm p-2 rounded shadow-md text-sm z-10">
             <div className="font-medium text-primary">Your Location</div>
@@ -72,9 +73,9 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
           </div>
         )}
         
-        {/* Navigation control */}
+        {/* Mobile-optimized navigation control */}
         {venues.length > 0 && (
-          <div className="absolute bottom-4 right-4 z-10">
+          <div className={`absolute ${isMobile ? 'bottom-16' : 'bottom-4'} right-4 z-10`}>
             <Button 
               variant="default"
               className="bg-primary/90 backdrop-blur-sm shadow-lg"
@@ -85,13 +86,13 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
                   
                   toast({
                     title: "Navigation Started",
-                    description: `Directions to ${nearestVenue.name} have been opened in a new tab.`,
+                    description: `Directions to ${nearestVenue.name} have been opened.`,
                   });
                 }
               }}
             >
               <Navigation className="mr-1" />
-              Navigate to nearest
+              Navigate
             </Button>
           </div>
         )}

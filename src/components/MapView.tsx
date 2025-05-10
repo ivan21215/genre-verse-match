@@ -6,6 +6,7 @@ import LoadingIndicator from "@/components/LoadingIndicator";
 import MapFrame from "@/components/MapFrame";
 import VenueList from "@/components/VenueList";
 import type { Venue } from "@/data/venueData";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MapViewProps {
   selectedGenre?: string;
@@ -18,6 +19,7 @@ const MapView: React.FC<MapViewProps> = ({
 }) => {
   const { userLocation, isLoading } = useLocation();
   const [nearbyVenues, setNearbyVenues] = useState<Venue[]>([]);
+  const isMobile = useIsMobile();
   
   // Get venues filtered by selected genre and type
   const venues = getVenuesByGenreAndType(selectedGenre, venueType);
@@ -42,7 +44,7 @@ const MapView: React.FC<MapViewProps> = ({
         selectedGenre={selectedGenre}
       />
       
-      <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm p-4">
+      <div className={`absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'}`}>
         <div className="text-sm text-muted-foreground mb-2">
           {selectedGenre === "All" && venueType === "All"
             ? "All Nearby Venues & Clubs:" 

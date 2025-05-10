@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { Geolocation } from '@capacitor/geolocation';
 
 interface LocationHookReturn {
   userLocation: { lat: number; lng: number } | null;
@@ -13,60 +14,97 @@ export const useLocation = (): LocationHookReturn => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      setIsLoading(true);
-      
-      // Add timeout handling to wait properly for geolocation
-      const timeoutId = setTimeout(() => {
-        console.log("Geolocation is taking too long, but still waiting...");
-      }, 5000);
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          clearTimeout(timeoutId);
-          const userPos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          console.log("Got user location:", userPos);
-          setUserLocation(userPos);
-          setIsLoading(false);
-          
-          toast({
-            title: "Location Found",
-            description: "We've found your location and showing nearby venues.",
-          });
-        },
-        (error) => {
-          clearTimeout(timeoutId);
-          console.error("Error getting location:", error);
-          setIsLoading(false);
-          
-          // Default to Zagreb if location access is denied
-          setUserLocation({ lat: 45.815, lng: 15.981 });
-          
-          toast({
-            title: "Location Access Denied",
-            description: "We're using a default location. Please enable location services for better results.",
-            variant: "destructive"
-          });
-        },
-        {
-          // Geolocation options - higher accuracy and longer timeout
+    const getLocationCapacitor = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Request permissions first (required for iOS)
+        await Geolocation.requestPermissions();
+        
+        const position = await Geolocation.getCurrentPosition({
           enableHighAccuracy: true,
           timeout: 10000,
           maximumAge: 0
-        }
-      );
+        });
+        
+        const userPos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        
+        console.log("Got user location:", userPos);
+        setUserLocation(userPos);
+        setIsLoading(false);
+        
+        toast({
+          title: "Location Found",
+          description: "We've found your location and showing nearby venues.",
+        });
+      } catch (error) {
+        console.error("Error getting location:", error);
+        setIsLoading(false);
+        
+        // Default to Zagreb if location access is denied
+        setUserLocation({ lat: 45.815, lng: 15.981 });
+        
+        toast({
+          title: "Location Access Denied",
+          description: "We're using a default location. Please enable location services for better results.",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    // Try to use Capacitor Geolocation
+    if (window.Capacitor) {
+      getLocationCapacitor();
     } else {
-      setIsLoading(false);
-      setUserLocation({ lat: 45.815, lng: 15.981 }); // Default to Zagreb
-      
-      toast({
-        title: "Location Not Supported",
-        description: "Your browser doesn't support geolocation. We're using a default location.",
-        variant: "destructive"
-      });
+      // Fallback to browser geolocation
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userPos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            console.log("Got user location:", userPos);
+            setUserLocation(userPos);
+            setIsLoading(false);
+            
+            toast({
+              title: "Location Found",
+              description: "We've found your location and showing nearby venues.",
+            });
+          },
+          (error) => {
+            console.error("Error getting location:", error);
+            setIsLoading(false);
+            
+            // Default to Zagreb if location access is denied
+            setUserLocation({ lat: 45.815, lng: 15.981 });
+            
+            toast({
+              title: "Location Access Denied",
+              description: "We're using a default location. Please enable location services for better results.",
+              variant: "destructive"
+            });
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        setIsLoading(false);
+        setUserLocation({ lat: 45.815, lng: 15.981 }); // Default to Zagreb
+        
+        toast({
+          title: "Location Not Supported",
+          description: "Your browser doesn't support geolocation. We're using a default location.",
+          variant: "destructive"
+        });
+      }
     }
   }, [toast]);
 
