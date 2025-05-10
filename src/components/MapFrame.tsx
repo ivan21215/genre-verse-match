@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
-import { getGenreColor, launchNavigation } from "@/utils/mapUtils";
 import type { Venue } from "@/data/venueData";
+import { getGenreColor, launchNavigation } from "@/utils/mapUtils";
 import { Navigation, MapPin } from "lucide-react";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -23,49 +23,28 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
     }
   }, [userLocation, venues, selectedGenre]);
   
-  // Calculate bounds to fit all venues and user location
-  const calculateBounds = () => {
-    const points = [...venues.map(v => v.location), ...(userLocation ? [userLocation] : [])];
-    if (points.length === 0) return "45.815,15.981";
-    
-    const lats = points.map(p => p.lat);
-    const lngs = points.map(p => p.lng);
-    
-    const minLat = Math.min(...lats) - 0.005;
-    const maxLat = Math.max(...lats) + 0.005;
-    const minLng = Math.min(...lngs) - 0.005;
-    const maxLng = Math.max(...lngs) + 0.005;
-    
-    return `${minLat},${minLng}|${maxLat},${maxLng}`;
-  };
-  
-  // Update venues to include calculated distances from user location
-  const updateVenueDistances = () => {
-    if (!userLocation) return venues;
-    
-    // This would update the real distances from user location
-    // For now we'll use the mock distances in the data
-    console.log("User location:", userLocation.lat, userLocation.lng);
-    return venues;
-  }
-  
-  // Fix the Google Maps URL to properly handle multiple locations
+  // Fix the Google Maps URL to properly handle location visualization
   const constructMapUrl = () => {
     if (!userLocation) {
       return;
     }
     
+    // Since Google Maps Embed API doesn't support multiple markers in the way we tried,
+    // we'll use a simpler approach that just centers the map on the user's location
     const center = `${userLocation.lat},${userLocation.lng}`;
-    // Calculate markers string for Google Maps
-    let markersParam = `&markers=color:red%7Clabel:You%7C${center}`;
+    const zoom = 14; // Appropriate zoom level to see nearby venues
     
-    // Add all venues as blue markers
-    venues.forEach((venue, index) => {
-      markersParam += `&markers=color:blue%7Clabel:${index + 1}%7C${venue.location.lat},${venue.location.lng}`;
-    });
-    
-    const url = `https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${center}&zoom=14${markersParam}`;
+    const url = `https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${center}&zoom=${zoom}`;
     setMapUrl(url);
+  };
+
+  // Find the nearest venue for navigation
+  const findNearestVenue = (): Venue | null => {
+    if (venues.length === 0) return null;
+    
+    // In a real app, we would calculate actual distances from user location
+    // For now, we just return the first venue in the list
+    return venues[0];
   };
 
   return (
@@ -100,14 +79,13 @@ const MapFrame: React.FC<MapFrameProps> = ({ userLocation, venues, selectedGenre
               variant="default"
               className="bg-primary/90 backdrop-blur-sm shadow-lg"
               onClick={() => {
-                if (userLocation && venues.length > 0) {
-                  // Navigate to the first venue
-                  const firstVenue = venues[0];
-                  launchNavigation(firstVenue.location.lat, firstVenue.location.lng);
+                const nearestVenue = findNearestVenue();
+                if (userLocation && nearestVenue) {
+                  launchNavigation(nearestVenue.location.lat, nearestVenue.location.lng);
                   
                   toast({
                     title: "Navigation Started",
-                    description: `Directions to ${firstVenue.name} have been opened in a new tab.`,
+                    description: `Directions to ${nearestVenue.name} have been opened in a new tab.`,
                   });
                 }
               }}

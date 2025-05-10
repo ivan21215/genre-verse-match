@@ -25,8 +25,8 @@ const MapView: React.FC<MapViewProps> = ({
   // When user location or venues change, update the list of nearby venues
   useEffect(() => {
     if (userLocation) {
-      // In a real app, we would calculate actual distances here
-      // For now, we're just using the mock distances in the data
+      // In a real app, we would filter venues based on proximity to user
+      // For now, we're using the mock data but logging the user's location
       console.log("User location updated:", userLocation);
       setNearbyVenues(venues);
     }
@@ -42,7 +42,6 @@ const MapView: React.FC<MapViewProps> = ({
         selectedGenre={selectedGenre}
       />
       
-      {/* Venue list below the map */}
       <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm p-4">
         <div className="text-sm text-muted-foreground mb-2">
           {selectedGenre === "All" && venueType === "All"
