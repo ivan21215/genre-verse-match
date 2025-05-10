@@ -1,7 +1,6 @@
 
 import React, { useState } from "react";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -45,6 +44,11 @@ const Venues = () => {
         setSubscriptionPlan("standard");
       }
     }
+  };
+
+  const handleUpgrade = () => {
+    setShowSubscriptionForm(true);
+    setBusinessType(businessType); // keep the current business type
   };
 
   return (
@@ -178,7 +182,7 @@ const Venues = () => {
                       <p className="text-sm text-center text-muted-foreground mb-4">
                         Upgrade to Premium to see detailed genre analytics
                       </p>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={handleUpgrade}>
                         Upgrade Now
                       </Button>
                     </div>
@@ -196,8 +200,6 @@ const Venues = () => {
           />
         )}
       </main>
-      
-      <Footer />
     </div>
   );
 };
