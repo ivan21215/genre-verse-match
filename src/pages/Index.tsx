@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import GenreExplorer from "@/components/GenreExplorer";
@@ -7,9 +8,15 @@ import MapView from "@/components/MapView";
 import ProfileSetup from "@/components/ProfileSetup";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { isUserLoggedIn } from "@/utils/authUtils";
 
 const Index = () => {
   const [selectedGenre, setSelectedGenre] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  useEffect(() => {
+    setIsLoggedIn(isUserLoggedIn());
+  }, []);
   
   // Sample venue data
   const venues = [
@@ -74,9 +81,9 @@ const Index = () => {
                     Get Started
                   </Button>
                 </Link>
-                <Link to="/venues">
+                <Link to={isLoggedIn ? "/venues" : "/auth"}>
                   <Button size="lg" variant="outline">
-                    For Venues
+                    {isLoggedIn ? "Go to Dashboard" : "For Venues & Clubs"}
                   </Button>
                 </Link>
               </div>
@@ -173,6 +180,14 @@ const Index = () => {
                   <span>Connect with like-minded music enthusiasts</span>
                 </li>
               </ul>
+              <div className="pt-4">
+                <h3 className="text-xl font-bold mb-2">Are you a venue or club owner?</h3>
+                <Link to="/auth">
+                  <Button className="mt-2">
+                    Register Your Business
+                  </Button>
+                </Link>
+              </div>
             </div>
             <div>
               <ProfileSetup />

@@ -1,23 +1,43 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, CreditCard, Lock } from "lucide-react";
+import { Calendar, CreditCard, Lock, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import VenueSubscriptionForm from "@/components/VenueSubscriptionForm";
 import VenueEventManager from "@/components/VenueEventManager";
 import GenrePopularityStats from "@/components/GenrePopularityStats";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 
 const Venues = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [showSubscriptionForm, setShowSubscriptionForm] = useState(false);
   const [venueLoggedIn, setVenueLoggedIn] = useState(false);
   const [venueCode, setVenueCode] = useState("");
   const [subscriptionPlan, setSubscriptionPlan] = useState<"standard" | "premium">("standard");
   const [businessType, setBusinessType] = useState<"venue" | "club">("venue");
+  const [userData, setUserData] = useState<any>(null);
+  
+  // Check if user is already logged in on component mount
+  useEffect(() => {
+    const currentUser = localStorage.getItem("currentUser");
+    if (currentUser) {
+      const user = JSON.parse(currentUser);
+      setUserData(user);
+      setBusinessType(user.businessType);
+      setVenueLoggedIn(true);
+      
+      // For demo purposes - set premium plan if the venue/club name contains "Premium"
+      if (user.name.toLowerCase().includes("premium")) {
+        setSubscriptionPlan("premium");
+      }
+    }
+  }, []);
   
   // Sample genre popularity data with correctly typed trends
   const genrePopularityData = [
@@ -50,6 +70,20 @@ const Venues = () => {
     setShowSubscriptionForm(true);
     setBusinessType(businessType); // keep the current business type
   };
+  
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    setVenueLoggedIn(false);
+    setUserData(null);
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    });
+  };
+  
+  const goToAuth = () => {
+    navigate("/auth");
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -76,7 +110,13 @@ const Venues = () => {
                       onChange={(e) => setVenueCode(e.target.value)}
                     />
                   </div>
-                  <Button onClick={handleLogin} className="w-full">Login</Button>
+                  <Button onClick={handleLogin} className="w-full">Login with Code</Button>
+                  <div className="text-center">
+                    <span className="text-sm text-muted-foreground">Or</span>
+                  </div>
+                  <Button onClick={goToAuth} variant="outline" className="w-full">
+                    Login with Email
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -127,11 +167,11 @@ const Venues = () => {
               </CardContent>
               <CardFooter>
                 <Button 
-                  onClick={() => setShowSubscriptionForm(true)}
+                  onClick={goToAuth}
                   className="w-full"
                 >
                   <CreditCard className="mr-2 h-4 w-4" />
-                  Subscribe Now
+                  Create Account
                 </Button>
               </CardFooter>
             </Card>
@@ -141,7 +181,7 @@ const Venues = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h2 className="text-2xl font-bold">
-                  {businessType === "club" ? "Club Dashboard" : "Venue Dashboard"}
+                  {userData ? userData.name : (businessType === "club" ? "Club Dashboard" : "Venue Dashboard")}
                 </h2>
                 <p className="text-muted-foreground">Manage your events and see genre analytics</p>
               </div>
@@ -150,7 +190,9 @@ const Venues = () => {
                   {subscriptionPlan === "premium" ? "Premium Plan" : "Standard Plan"}
                 </Badge>
                 <Button variant="outline" size="sm">Manage Subscription</Button>
-                <Button variant="ghost" size="sm" onClick={() => setVenueLoggedIn(false)}>Logout</Button>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-1" /> Logout
+                </Button>
               </div>
             </div>
             
