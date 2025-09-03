@@ -1,20 +1,20 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import { Lock, Mail, User, Building, MapPin } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signUp, signIn, user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [businessType, setBusinessType] = useState<"venue" | "club">("venue");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [loginData, setLoginData] = useState({
     email: "",
@@ -29,6 +29,13 @@ const Auth = () => {
     address: ""
   });
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !loading) {
+      navigate("/");
+    }
+  }, [user, loading, navigate]);
+
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginData(prev => ({ ...prev, [name]: value }));
@@ -39,88 +46,43 @@ const Auth = () => {
     setRegisterData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // In a real app, this would validate against a backend
-    const storedUser = localStorage.getItem(`${businessType}_${loginData.email}`);
+    if (isSubmitting) return;
     
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      if (user.password === loginData.password) {
-        // Store logged in state
-        localStorage.setItem("currentUser", JSON.stringify({
-          email: user.email,
-          name: user.name,
-          businessType: businessType,
-          address: user.address
-        }));
-        
-        toast({
-          title: "Login Successful",
-          description: `Welcome back, ${user.name}!`,
-        });
-        
-        navigate("/venues");
-        return;
-      }
+    setIsSubmitting(true);
+    
+    const { error } = await signIn(loginData.email, loginData.password);
+    
+    if (!error) {
+      navigate("/");
     }
     
-    toast({
-      title: "Login Failed",
-      description: "Invalid email or password. Please try again.",
-      variant: "destructive"
-    });
+    setIsSubmitting(false);
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isSubmitting) return;
     
     // Basic validation
     if (registerData.password !== registerData.confirmPassword) {
-      toast({
-        title: "Registration Error",
-        description: "Passwords do not match!",
-        variant: "destructive"
-      });
       return;
     }
     
-    // Check if user already exists
-    const existingUser = localStorage.getItem(`${businessType}_${registerData.email}`);
-    if (existingUser) {
-      toast({
-        title: "Registration Error",
-        description: "A user with this email already exists!",
-        variant: "destructive"
-      });
-      return;
-    }
+    setIsSubmitting(true);
     
-    // In a real app, this would send data to a backend
-    localStorage.setItem(`${businessType}_${registerData.email}`, JSON.stringify({
-      name: registerData.name,
-      email: registerData.email,
-      password: registerData.password, // In a real app, never store passwords in plain text
-      address: registerData.address,
-      businessType: businessType,
-      registeredAt: new Date().toISOString()
-    }));
+    const { error } = await signUp(
+      registerData.email,
+      registerData.password,
+      registerData.name,
+      businessType,
+      registerData.address
+    );
     
-    // Store logged in state
-    localStorage.setItem("currentUser", JSON.stringify({
-      email: registerData.email,
-      name: registerData.name,
-      businessType: businessType,
-      address: registerData.address
-    }));
-    
-    toast({
-      title: "Registration Successful",
-      description: `Your ${businessType} account has been created!`,
-    });
-    
-    navigate("/venues");
+    setIsSubmitting(false);
   };
 
   const isLoginFormValid = loginData.email.trim() !== "" && loginData.password.trim() !== "";
@@ -132,6 +94,14 @@ const Auth = () => {
     registerData.confirmPassword.trim() !== "" &&
     registerData.address.trim() !== "" &&
     registerData.password === registerData.confirmPassword;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -208,8 +178,12 @@ const Auth = () => {
                     </div>
                   </div>
                   
-                  <Button type="submit" className="w-full" disabled={!isLoginFormValid}>
-                    Login
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={!isLoginFormValid || isSubmitting}
+                  >
+                    {isSubmitting ? "Signing In..." : "Login"}
                   </Button>
                 </form>
               </TabsContent>
@@ -299,8 +273,12 @@ const Auth = () => {
                     </div>
                   </div>
                   
-                  <Button type="submit" className="w-full" disabled={!isRegisterFormValid}>
-                    Register
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={!isRegisterFormValid || isSubmitting}
+                  >
+                    {isSubmitting ? "Registering..." : "Register"}
                   </Button>
                 </form>
               </TabsContent>

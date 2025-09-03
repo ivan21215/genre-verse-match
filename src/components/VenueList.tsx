@@ -1,18 +1,22 @@
 
 import React from "react";
-import type { Venue } from "@/data/venueData";
+import type { Venue } from "@/hooks/useVenues";
+import { useVenues } from "@/hooks/useVenues";
 import { getGenreColor, launchNavigation } from "@/utils/mapUtils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
 
 interface VenueListProps {
-  venues: Venue[];
   selectedGenre: string;
+  venueType?: "All" | "Venue" | "Club";
 }
 
-const VenueList: React.FC<VenueListProps> = ({ venues, selectedGenre }) => {
+const VenueList: React.FC<VenueListProps> = ({ selectedGenre, venueType = "All" }) => {
+  const { getVenuesByGenreAndType } = useVenues();
   const { toast } = useToast();
+  
+  const venues = getVenuesByGenreAndType(selectedGenre, venueType);
 
   const handleNavigate = (venue: Venue) => {
     launchNavigation(venue.location.lat, venue.location.lng);

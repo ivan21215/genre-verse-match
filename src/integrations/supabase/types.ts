@@ -14,7 +14,137 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          attendees: number | null
+          created_at: string
+          description: string | null
+          end_time: string | null
+          event_date: string
+          genre: string
+          id: string
+          max_attendees: number | null
+          start_time: string
+          title: string
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          attendees?: number | null
+          created_at?: string
+          description?: string | null
+          end_time?: string | null
+          event_date: string
+          genre: string
+          id?: string
+          max_attendees?: number | null
+          start_time: string
+          title: string
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          attendees?: number | null
+          created_at?: string
+          description?: string | null
+          end_time?: string | null
+          event_date?: string
+          genre?: string
+          id?: string
+          max_attendees?: number | null
+          start_time?: string
+          title?: string
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          business_type: string | null
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          business_type?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          business_type?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      venues: {
+        Row: {
+          address: string
+          created_at: string
+          distance: string | null
+          genre: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          owner_id: string
+          subscription_plan: string | null
+          updated_at: string
+          venue_code: string | null
+          venue_type: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          distance?: string | null
+          genre: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          owner_id: string
+          subscription_plan?: string | null
+          updated_at?: string
+          venue_code?: string | null
+          venue_type: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          distance?: string | null
+          genre?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          owner_id?: string
+          subscription_plan?: string | null
+          updated_at?: string
+          venue_code?: string | null
+          venue_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

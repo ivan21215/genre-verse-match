@@ -1,247 +1,151 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useVenues } from "@/hooks/useVenues";
 import Header from "@/components/Header";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Calendar, CreditCard, Lock, LogOut } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import VenueSubscriptionForm from "@/components/VenueSubscriptionForm";
+import Footer from "@/components/Footer";
 import VenueEventManager from "@/components/VenueEventManager";
 import GenrePopularityStats from "@/components/GenrePopularityStats";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Star, Crown, Settings, RefreshCw } from "lucide-react";
 
 const Venues = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [showSubscriptionForm, setShowSubscriptionForm] = useState(false);
-  const [venueLoggedIn, setVenueLoggedIn] = useState(false);
-  const [venueCode, setVenueCode] = useState("");
+  const { user, profile, loading } = useAuth();
+  const { venues, fetchVenues } = useVenues();
   const [subscriptionPlan, setSubscriptionPlan] = useState<"standard" | "premium">("standard");
-  const [businessType, setBusinessType] = useState<"venue" | "club">("venue");
-  const [userData, setUserData] = useState<any>(null);
-  
-  // Check if user is already logged in on component mount
-  useEffect(() => {
-    const currentUser = localStorage.getItem("currentUser");
-    if (currentUser) {
-      const user = JSON.parse(currentUser);
-      setUserData(user);
-      setBusinessType(user.businessType);
-      setVenueLoggedIn(true);
-      
-      // For demo purposes - set premium plan if the venue/club name contains "Premium"
-      if (user.name.toLowerCase().includes("premium")) {
-        setSubscriptionPlan("premium");
-      }
-    }
-  }, []);
-  
-  // Sample genre popularity data with correctly typed trends
+
+  // Sample genre popularity data (in a real app, this would come from analytics)
   const genrePopularityData = [
-    { genre: "Techno", count: 342, trend: "up" as const },
-    { genre: "Hip Hop", count: 289, trend: "up" as const },
-    { genre: "Rock", count: 187, trend: "down" as const },
-    { genre: "Cajke", count: 256, trend: "up" as const },
-    { genre: "Trash", count: 201, trend: "stable" as const },
-    { genre: "White Girl Music", count: 312, trend: "up" as const },
-    { genre: "Dance", count: 178, trend: "down" as const },
-    { genre: "Jazz", count: 98, trend: "stable" as const },
-    { genre: "Rap", count: 276, trend: "up" as const },
+    { genre: "Techno", count: 1240, trend: "up" as const },
+    { genre: "Hip Hop", count: 980, trend: "up" as const },
+    { genre: "Rock", count: 756, trend: "stable" as const },
+    { genre: "Jazz", count: 543, trend: "down" as const },
+    { genre: "Pop", count: 432, trend: "up" as const },
+    { genre: "Cajke", count: 324, trend: "stable" as const },
   ];
 
-  const handleLogin = () => {
-    if (venueCode.trim() !== "") {
-      setVenueLoggedIn(true);
-      
-      // Determine subscription plan from venue code (in a real app, this would be validated server-side)
-      // For this example, we'll assume codes containing "PRE" are premium
-      if (venueCode.includes("PRE")) {
-        setSubscriptionPlan("premium");
-      } else {
-        setSubscriptionPlan("standard");
-      }
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
     }
-  };
+  }, [user, loading, navigate]);
 
-  const handleUpgrade = () => {
-    setShowSubscriptionForm(true);
-    setBusinessType(businessType); // keep the current business type
-  };
-  
-  const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    setVenueLoggedIn(false);
-    setUserData(null);
-    toast({
-      title: "Logged Out",
-      description: "You have been successfully logged out.",
-    });
-  };
-  
-  const goToAuth = () => {
-    navigate("/auth");
-  };
+  const userVenues = venues.filter(venue => venue.owner_id === user?.id);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return null; // Will redirect to auth
+  }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">For Venues & Clubs</h1>
-        
-        {!venueLoggedIn ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>Venue/Club Login</CardTitle>
-                <CardDescription>
-                  Enter your code to access your dashboard
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <Input 
-                      placeholder="Enter your venue/club code" 
-                      value={venueCode}
-                      onChange={(e) => setVenueCode(e.target.value)}
-                    />
-                  </div>
-                  <Button onClick={handleLogin} className="w-full">Login with Code</Button>
-                  <div className="text-center">
-                    <span className="text-sm text-muted-foreground">Or</span>
-                  </div>
-                  <Button onClick={goToAuth} variant="outline" className="w-full">
-                    Login with Email
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Join the Network</CardTitle>
-                <CardDescription>
-                  List your venue or club and reach more customers
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <Tabs defaultValue="venue" className="w-full mb-4">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="venue" onClick={() => setBusinessType("venue")}>Venue</TabsTrigger>
-                      <TabsTrigger value="club" onClick={() => setBusinessType("club")}>Club</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="border rounded-md p-4 hover:border-primary transition-colors">
-                      <div className="font-bold mb-1">Standard Plan</div>
-                      <div className="text-2xl font-bold mb-2">$49.99<span className="text-sm font-normal text-muted-foreground">/month</span></div>
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-center gap-2">
-                          <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[10px] text-white">✓</div>
-                          <span>Post events to calendar</span>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="border rounded-md p-4 bg-muted/20 hover:border-primary transition-colors">
-                      <div className="font-bold mb-1">Premium Plan</div>
-                      <div className="text-2xl font-bold mb-2">$99.99<span className="text-sm font-normal text-muted-foreground">/month</span></div>
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-center gap-2">
-                          <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[10px] text-white">✓</div>
-                          <span>Post events to calendar</span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[10px] text-white">✓</div>
-                          <span>Genre popularity analytics</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  onClick={goToAuth}
-                  className="w-full"
-                >
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Create Account
-                </Button>
-              </CardFooter>
-            </Card>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div>
-                <h2 className="text-2xl font-bold">
-                  {userData ? userData.name : (businessType === "club" ? "Club Dashboard" : "Venue Dashboard")}
-                </h2>
-                <p className="text-muted-foreground">Manage your events and see genre analytics</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge className={subscriptionPlan === "premium" ? "bg-purple-500" : "bg-green-500"}>
-                  {subscriptionPlan === "premium" ? "Premium Plan" : "Standard Plan"}
-                </Badge>
-                <Button variant="outline" size="sm">Manage Subscription</Button>
-                <Button variant="ghost" size="sm" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4 mr-1" /> Logout
-                </Button>
-              </div>
+      <div className="container mx-auto pt-24 pb-12 px-4 flex-grow">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">
+                Welcome back, {profile.name}!
+              </h1>
+              <p className="text-muted-foreground">
+                Manage your {profile.business_type} and events from your dashboard.
+              </p>
             </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Event Manager
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <VenueEventManager />
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Genre Popularity</CardTitle>
-                  <CardDescription>Weekly trends based on user preferences</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {subscriptionPlan === "premium" ? (
-                    <GenrePopularityStats data={genrePopularityData} />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <Lock className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="font-medium text-lg mb-2">Premium Feature</h3>
-                      <p className="text-sm text-center text-muted-foreground mb-4">
-                        Upgrade to Premium to see detailed genre analytics
-                      </p>
-                      <Button variant="outline" size="sm" onClick={handleUpgrade}>
-                        Upgrade Now
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+            <div className="flex items-center gap-2">
+              <Badge variant={subscriptionPlan === "premium" ? "default" : "secondary"}>
+                {subscriptionPlan === "premium" ? (
+                  <><Crown className="w-4 h-4 mr-1" /> Premium</>
+                ) : (
+                  <><Star className="w-4 h-4 mr-1" /> Standard</>
+                )}
+              </Badge>
+              <Button variant="outline" size="sm" onClick={fetchVenues}>
+                <RefreshCw className="w-4 h-4 mr-1" />
+                Refresh
+              </Button>
             </div>
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Event Management Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Event Management
+              </CardTitle>
+              <CardDescription>
+                Create and manage events for your {profile.business_type}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <VenueEventManager />
+            </CardContent>
+          </Card>
+
+          {/* Genre Popularity Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Genre Popularity</CardTitle>
+              <CardDescription>
+                See what's trending in your area
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <GenrePopularityStats data={genrePopularityData} />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Your Venues Section */}
+        {userVenues.length > 0 && (
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Your Venues</CardTitle>
+              <CardDescription>
+                Manage your registered venues and their details
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {userVenues.map((venue) => (
+                  <div key={venue.id} className="p-4 border rounded-lg">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium">{venue.name}</h3>
+                        <p className="text-sm text-muted-foreground">{venue.address}</p>
+                        <div className="flex gap-2 mt-2">
+                          <Badge variant="outline">{venue.genre}</Badge>
+                          <Badge variant="outline">{venue.type}</Badge>
+                        </div>
+                      </div>
+                      <Badge variant={venue.subscription_plan === "premium" ? "default" : "secondary"}>
+                        {venue.subscription_plan}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
-        
-        {showSubscriptionForm && (
-          <VenueSubscriptionForm 
-            onClose={() => setShowSubscriptionForm(false)} 
-            businessType={businessType}
-          />
-        )}
-      </main>
+      </div>
+
+      <Footer />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import type { Venue } from "@/data/venueData";
+import type { Venue } from "@/hooks/useVenues";
 import { getGenreColor, launchNavigation } from "@/utils/mapUtils";
 import { Navigation, MapPin, RefreshCcw } from "lucide-react";
 import { Button } from "./ui/button";
