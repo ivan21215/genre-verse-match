@@ -11,9 +11,7 @@ export interface Review {
   comment: string | null;
   created_at: string;
   updated_at: string;
-  profiles?: {
-    name: string;
-  };
+  user_name?: string;
 }
 
 export const useReviews = (venueId?: string) => {
@@ -28,12 +26,7 @@ export const useReviews = (venueId?: string) => {
       setLoading(true);
       let query = supabase
         .from('reviews')
-        .select(`
-          *,
-          profiles (
-            name
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (targetVenueId) {
@@ -70,12 +63,7 @@ export const useReviews = (venueId?: string) => {
           rating,
           comment: comment || null
         }])
-        .select(`
-          *,
-          profiles (
-            name
-          )
-        `)
+        .select('*')
         .single();
         
       if (error) throw error;
@@ -107,12 +95,7 @@ export const useReviews = (venueId?: string) => {
           comment: comment || null
         })
         .eq('id', reviewId)
-        .select(`
-          *,
-          profiles (
-            name
-          )
-        `)
+        .select('*')
         .single();
         
       if (error) throw error;

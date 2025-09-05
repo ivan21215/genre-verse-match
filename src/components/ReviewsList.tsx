@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { useReviews, Review } from '@/hooks/useReviews';
 import { useAuth } from '@/contexts/AuthContext';
 import { ReviewForm } from './ReviewForm';
-import { LoadingIndicator } from './LoadingIndicator';
+import LoadingIndicator from './LoadingIndicator';
 
 interface ReviewsListProps {
   venueId: string;
@@ -133,9 +133,9 @@ export const ReviewsList: React.FC<ReviewsListProps> = ({ venueId }) => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium">
-                        {review.profiles?.name || 'Anonymous'}
-                      </span>
+                    <span className="font-medium">
+                      {review.user_name || 'Anonymous User'}
+                    </span>
                       <StarRating rating={review.rating} />
                     </div>
                     <p className="text-sm text-muted-foreground mb-2">
