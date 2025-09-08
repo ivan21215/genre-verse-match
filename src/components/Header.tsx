@@ -36,6 +36,9 @@ const Header = () => {
           <Link to="/map">
             <Button variant="ghost" className="text-foreground hover:text-primary">Map</Button>
           </Link>
+          <Link to="/subscriptions">
+            <Button variant="ghost" className="text-foreground hover:text-primary">Subscriptions</Button>
+          </Link>
           {user && (
             <Link to="/venues">
               <Button variant="ghost" className="text-foreground hover:text-primary">Venues</Button>
@@ -89,6 +92,9 @@ const Header = () => {
             </Link>
             <Link to="/map" onClick={() => setIsMenuOpen(false)}>
               <Button variant="ghost" className="w-full justify-start text-foreground hover:text-primary">Map</Button>
+            </Link>
+            <Link to="/subscriptions" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start text-foreground hover:text-primary">Subscriptions</Button>
             </Link>
             {user && (
               <Link to="/venues" onClick={() => setIsMenuOpen(false)}>
