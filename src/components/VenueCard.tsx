@@ -1,80 +1,83 @@
 
 import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Music, User } from "lucide-react";
+import { MapPin, Users } from "lucide-react";
+import { VenueRating } from "@/components/VenueRating";
+import FavoriteButton from "@/components/FavoriteButton";
 
 interface VenueCardProps {
+  id?: string;
   name: string;
-  image: string;
+  image?: string;
   address: string;
   event?: string;
   genres: string[];
-  attendees: number;
+  attendees?: number;
+  onClick?: () => void;
 }
 
-const getGenreColor = (genre: string): string => {
-  const genreMap: Record<string, string> = {
-    "Electronic": "bg-genre-electronic",
-    "Hip Hop": "bg-genre-hiphop",
-    "Rock": "bg-genre-rock",
-    "Pop": "bg-genre-pop",
-    "Jazz": "bg-genre-jazz",
-    "R&B": "bg-genre-rnb",
-    "Techno": "bg-genre-techno",
-    "House": "bg-genre-house",
-  };
-  
-  return genreMap[genre] || "bg-primary";
-};
-
 const VenueCard: React.FC<VenueCardProps> = ({
+  id,
   name,
   image,
   address,
   event,
   genres,
-  attendees
+  attendees,
+  onClick
 }) => {
+  const defaultImage = "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=1740&auto=format&fit=crop";
+  
   return (
-    <div className="venue-card relative rounded-xl overflow-hidden shadow-lg group h-[280px]">
-      <div 
-        className="absolute inset-0 bg-cover bg-center" 
-        style={{ backgroundImage: `url(${image})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-venue"></div>
-      
-      {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-        <h3 className="text-xl font-bold">{name}</h3>
-        <p className="text-sm text-gray-300 mb-2">{address}</p>
-        
-        {/* Event details if available */}
-        {event && (
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4" />
-            <span className="text-sm">{event}</span>
+    <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden" onClick={onClick}>
+      <div className="relative">
+        <img
+          src={image || defaultImage}
+          alt={name}
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        {id && (
+          <div className="absolute top-2 right-2">
+            <FavoriteButton venueId={id} />
           </div>
         )}
+        {event && (
+          <div className="absolute bottom-2 left-2">
+            <Badge className="bg-primary/90 text-primary-foreground">
+              {event}
+            </Badge>
+          </div>
+        )}
+      </div>
+      
+      <CardContent className="p-4 space-y-3">
+        <div className="flex justify-between items-start">
+          <h3 className="font-semibold text-lg">{name}</h3>
+          {id && <VenueRating venueId={id} size="sm" />}
+        </div>
         
-        {/* Genres */}
-        <div className="flex flex-wrap gap-1 mb-3">
-          {genres.map((genre) => (
-            <Badge 
-              key={genre} 
-              className={`${getGenreColor(genre)} text-xs`}
-            >
+        <div className="flex items-center text-muted-foreground text-sm">
+          <MapPin className="h-4 w-4 mr-1" />
+          {address}
+        </div>
+        
+        <div className="flex flex-wrap gap-1">
+          {genres.map((genre, index) => (
+            <Badge key={index} variant="secondary" className="text-xs">
               {genre}
             </Badge>
           ))}
         </div>
         
-        {/* Attendee count */}
-        <div className="flex items-center gap-1">
-          <User className="h-4 w-4" />
-          <span className="text-xs">{attendees} attending</span>
-        </div>
-      </div>
-    </div>
+        {attendees && (
+          <div className="flex items-center text-muted-foreground text-sm">
+            <Users className="h-4 w-4 mr-1" />
+            {attendees} attending
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

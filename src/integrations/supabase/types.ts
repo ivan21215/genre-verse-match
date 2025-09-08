@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      event_rsvps: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_rsvps_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           attendees: number | null
@@ -127,6 +162,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+          venue_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+          venue_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venues: {
         Row: {
           address: string
@@ -134,6 +198,7 @@ export type Database = {
           distance: string | null
           genre: string
           id: string
+          image_url: string | null
           latitude: number | null
           longitude: number | null
           name: string
@@ -149,6 +214,7 @@ export type Database = {
           distance?: string | null
           genre: string
           id?: string
+          image_url?: string | null
           latitude?: number | null
           longitude?: number | null
           name: string
@@ -164,6 +230,7 @@ export type Database = {
           distance?: string | null
           genre?: string
           id?: string
+          image_url?: string | null
           latitude?: number | null
           longitude?: number | null
           name?: string

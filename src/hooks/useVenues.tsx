@@ -12,6 +12,7 @@ export interface Venue {
   address?: string;
   subscription_plan?: string;
   venue_code?: string;
+  image_url?: string;
 }
 
 export const useVenues = () => {
@@ -38,7 +39,8 @@ export const useVenues = () => {
         owner_id: venue.owner_id,
         address: venue.address,
         subscription_plan: venue.subscription_plan,
-        venue_code: venue.venue_code
+        venue_code: venue.venue_code,
+        image_url: venue.image_url
       }));
       
       setVenues(transformedVenues);

@@ -9,54 +9,19 @@ import ProfileSetup from "@/components/ProfileSetup";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { isUserLoggedIn } from "@/utils/authUtils";
+import { useVenues } from "@/hooks/useVenues";
 
 const Index = () => {
   const [selectedGenre, setSelectedGenre] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { venues, loading } = useVenues();
   
   useEffect(() => {
     setIsLoggedIn(isUserLoggedIn());
   }, []);
   
-  // Sample venue data
-  const venues = [
-    {
-      id: 1,
-      name: "Pulse Nightclub",
-      image: "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=1740&auto=format&fit=crop",
-      address: "432 Market St, San Francisco",
-      event: "Electric Friday",
-      genres: ["Electronic", "Techno"],
-      attendees: 124
-    },
-    {
-      id: 2,
-      name: "Jazz Central",
-      image: "https://images.unsplash.com/photo-1504502350688-00f5d59bbdeb?q=80&w=1740&auto=format&fit=crop",
-      address: "221 Pine Ave, San Francisco",
-      event: "Smooth Jazz Night",
-      genres: ["Jazz", "R&B"],
-      attendees: 87
-    },
-    {
-      id: 3,
-      name: "The Bassment",
-      image: "https://images.unsplash.com/photo-1520483691742-bada60a1edd6?q=80&w=1738&auto=format&fit=crop",
-      address: "118 Howard St, San Francisco",
-      event: "Hip Hop Thursdays",
-      genres: ["Hip Hop", "R&B"],
-      attendees: 156
-    },
-    {
-      id: 4,
-      name: "Vinyl Room",
-      image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1740&auto=format&fit=crop",
-      address: "876 Valencia St, San Francisco",
-      event: "Retro Rock Party",
-      genres: ["Rock", "Pop"],
-      attendees: 92
-    }
-  ];
+  // Get a sample of venues for homepage display
+  const sampleVenues = venues.slice(0, 4);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -125,17 +90,40 @@ const Index = () => {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {venues.map((venue) => (
-              <VenueCard
-                key={venue.id}
-                name={venue.name}
-                image={venue.image}
-                address={venue.address}
-                event={venue.event}
-                genres={venue.genres}
-                attendees={venue.attendees}
-              />
-            ))}
+            {loading ? (
+              // Loading placeholders
+              Array.from({ length: 4 }).map((_, index) => (
+                <Card key={index} className="animate-pulse">
+                  <div className="w-full h-48 bg-muted"></div>
+                  <CardContent className="p-4 space-y-3">
+                    <div className="h-6 bg-muted rounded"></div>
+                    <div className="h-4 bg-muted rounded w-3/4"></div>
+                    <div className="flex gap-2">
+                      <div className="h-5 bg-muted rounded w-16"></div>
+                      <div className="h-5 bg-muted rounded w-20"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : sampleVenues.length > 0 ? (
+              sampleVenues.map((venue) => (
+                <VenueCard
+                  key={venue.id}
+                  id={venue.id}
+                  name={venue.name}
+                  image={venue.image_url}
+                  address={venue.address}
+                  genres={[venue.genre]}
+                />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8 text-muted-foreground">
+                <p>No venues available yet. Be the first to add one!</p>
+                <Link to="/auth">
+                  <Button className="mt-4">Add Your Venue</Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
