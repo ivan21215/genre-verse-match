@@ -49,6 +49,50 @@ export type Database = {
           },
         ]
       }
+      event_tickets: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          id: string
+          price: number
+          quantity_available: number | null
+          quantity_sold: number | null
+          stripe_price_id: string | null
+          ticket_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          price?: number
+          quantity_available?: number | null
+          quantity_sold?: number | null
+          stripe_price_id?: string | null
+          ticket_type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          price?: number
+          quantity_available?: number | null
+          quantity_sold?: number | null
+          stripe_price_id?: string | null
+          ticket_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           attendees: number | null
@@ -162,6 +206,132 @@ export type Database = {
         }
         Relationships: []
       }
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          subscribed: boolean
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          currency: string | null
+          features: Json
+          id: string
+          interval: string | null
+          name: string
+          price: number
+          stripe_price_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          features?: Json
+          id?: string
+          interval?: string | null
+          name: string
+          price: number
+          stripe_price_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          features?: Json
+          id?: string
+          interval?: string | null
+          name?: string
+          price?: number
+          stripe_price_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ticket_purchases: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          id: string
+          quantity: number
+          status: string | null
+          stripe_session_id: string | null
+          ticket_id: string | null
+          total_amount: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          quantity?: number
+          status?: string | null
+          stripe_session_id?: string | null
+          ticket_id?: string | null
+          total_amount: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          quantity?: number
+          status?: string | null
+          stripe_session_id?: string | null
+          ticket_id?: string | null
+          total_amount?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_purchases_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_purchases_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "event_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_favorites: {
         Row: {
           created_at: string
@@ -184,6 +354,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "user_favorites_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_analytics: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          metric_type: string
+          metric_value: number
+          venue_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          metric_type: string
+          metric_value?: number
+          venue_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          metric_type?: string
+          metric_value?: number
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_analytics_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
             referencedRelation: "venues"
