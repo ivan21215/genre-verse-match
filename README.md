@@ -1,61 +1,61 @@
 
-# 🎶 VIBEVERSE — Aplikacija za ljubitelje izlazaka i muzike  
+# 🎶 VIBEVERSE — App for Nightlife and Music Lovers  
 
-## Zašto postoji?  
-Zbog manjka raznolikosti muzike u klubovima. Ljudi žele utjecati na ono što će slušati kada izlaze, a klubovi žele znati što njihova publika traži.  
-VIBEVERSE omogućava povezivanje ljubitelja muzike i klubova kroz glasanje, evente i interaktivnu mapu.  
+## Why does it exist?  
+Because of the lack of music variety in clubs. People want to influence what they will hear when they go out, and clubs want to know what their audience is asking for.  
+VIBEVERSE connects music lovers and clubs through voting, events, and an interactive map.  
 
-## ✨ Funkcionalnosti  
+## ✨ Features  
 
-1. **Glasanje za žanrove**  
-   - Korisnici glasaju koji muzički žanr žele slušati na nadolazećim eventima.  
-   - Statistika se skuplja i prikazuje klubovima.  
+1. **Genre Voting**  
+   - Users can vote for which music genre they would like to hear at upcoming events.  
+   - Statistics are collected and shown to clubs.  
 
-2. **Eventi klubova**  
-   - Klubovi objavljuju svoje evente (datum, žanr, opis).  
-   - Korisnici pregledavaju i filtriraju evente prema žanru ili lokaciji.  
+2. **Club Events**  
+   - Clubs can publish their events (date, genre, description).  
+   - Users can browse and filter events by genre or location.  
 
-3. **Mapa događaja**  
-   - Interaktivna mapa prikazuje evente u blizini.  
-   - Moguće filtriranje po žanru.  
+3. **Event Map**  
+   - An interactive map displays nearby events.  
+   - Events can be filtered by genre.  
 
-4. **Statistika za klubove**  
-   - Klubovi dobivaju uvid u to koliko je korisnika zainteresirano za pojedine žanrove.  
-   - Pomaže u planiranju muzičkih programa.  
+4. **Club Statistics**  
+   - Clubs gain insights into how many users are interested in specific genres.  
+   - Helps in planning music programs.  
 
-5. **Povezivanje sa Spotify-em**  
-   - Integracija sa Spotify API-jem.  
-   - Moguće povezivanje muzičkog ukusa korisnika s eventima i klubovima.  
+5. **Spotify Integration**  
+   - Integration with the Spotify API.  
+   - Connects users’ music tastes with events and clubs.  
 
-6. **Personalizacija za korisnike**  
-   - Preporuke eventa i klubova na temelju preferencija i glasanja.  
+6. **User Personalization**  
+   - Personalized event and club recommendations based on preferences and votes.  
 
 ---
 
-## 🚀 Tehničke informacije  
+## 🚀 Tech Stack  
 
 - **Frontend:** React, Vite, TailwindCSS, shadcn/ui, lucide-react  
-- **Mobile build:** Ionic Capacitor (mogućnost objave kao mobilna aplikacija)  
-- **Backend / API:** (ovisno o implementaciji, vidi kod za detalje)  
-- **Integracije:** Spotify API, interaktivna mapa (npr. Mapbox/Leaflet)  
+- **Mobile build:** Ionic Capacitor (can be deployed as a mobile app)  
+- **Backend / API:** (depends on implementation, check code for details)  
+- **Integrations:** Spotify API, interactive map (e.g. Mapbox/Leaflet)  
 
 ---
 
-## 🔧 Instalacija  
+## 🔧 Installation  
 
-1. Instaliraj Node.js (v16+ preporučeno) ili Bun.  
-2. Kloniraj repozitorij i uđi u direktorij:  
+1. Install Node.js (v16+ recommended) or Bun.  
+2. Clone the repository and enter the directory:  
    ```bash
    git clone <repo-url>
    cd VIBEVERSE/genre-verse-match
    ```  
-3. Instaliraj zavisnosti:  
+3. Install dependencies:  
    ```bash
    npm install
-   # ili
+   # or
    bun install
    ```  
-4. Pokreni aplikaciju u razvojnom modu:  
+4. Run the app in development mode:  
    ```bash
    npm run dev
    ```  
@@ -64,14 +64,13 @@ VIBEVERSE omogućava povezivanje ljubitelja muzike i klubova kroz glasanje, even
 
 ## 🤝 Contributing  
 
-Ako želiš doprinijeti:  
-- otvori issue ili PR,  
-- piši testove,  
-- ažuriraj dokumentaciju.  
+If you’d like to contribute:  
+- open an issue or PR,  
+- write tests,  
+- update documentation.  
 
 ---
 
-## 📄 Licenca  
+## 📄 License  
 
-Dodaj odgovarajuću licencu (npr. MIT, Apache-2.0).  
-
+Add an appropriate license (e.g. MIT, Apache-2.0).  
