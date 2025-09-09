@@ -1,73 +1,77 @@
-# Welcome to your Lovable project
 
-## Project info
+# 🎶 VIBEVERSE — Aplikacija za ljubitelje izlazaka i muzike  
 
-**URL**: https://lovable.dev/projects/c3d979e1-5411-4a67-b689-3bdbf985a60c
+## Zašto postoji?  
+Zbog manjka raznolikosti muzike u klubovima. Ljudi žele utjecati na ono što će slušati kada izlaze, a klubovi žele znati što njihova publika traži.  
+VIBEVERSE omogućava povezivanje ljubitelja muzike i klubova kroz glasanje, evente i interaktivnu mapu.  
 
-## How can I edit this code?
+## ✨ Funkcionalnosti  
 
-There are several ways of editing your application.
+1. **Glasanje za žanrove**  
+   - Korisnici glasaju koji muzički žanr žele slušati na nadolazećim eventima.  
+   - Statistika se skuplja i prikazuje klubovima.  
 
-**Use Lovable**
+2. **Eventi klubova**  
+   - Klubovi objavljuju svoje evente (datum, žanr, opis).  
+   - Korisnici pregledavaju i filtriraju evente prema žanru ili lokaciji.  
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c3d979e1-5411-4a67-b689-3bdbf985a60c) and start prompting.
+3. **Mapa događaja**  
+   - Interaktivna mapa prikazuje evente u blizini.  
+   - Moguće filtriranje po žanru.  
 
-Changes made via Lovable will be committed automatically to this repo.
+4. **Statistika za klubove**  
+   - Klubovi dobivaju uvid u to koliko je korisnika zainteresirano za pojedine žanrove.  
+   - Pomaže u planiranju muzičkih programa.  
 
-**Use your preferred IDE**
+5. **Povezivanje sa Spotify-em**  
+   - Integracija sa Spotify API-jem.  
+   - Moguće povezivanje muzičkog ukusa korisnika s eventima i klubovima.  
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+6. **Personalizacija za korisnike**  
+   - Preporuke eventa i klubova na temelju preferencija i glasanja.  
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🚀 Tehničke informacije  
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Frontend:** React, Vite, TailwindCSS, shadcn/ui, lucide-react  
+- **Mobile build:** Ionic Capacitor (mogućnost objave kao mobilna aplikacija)  
+- **Backend / API:** (ovisno o implementaciji, vidi kod za detalje)  
+- **Integracije:** Spotify API, interaktivna mapa (npr. Mapbox/Leaflet)  
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🔧 Instalacija  
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+1. Instaliraj Node.js (v16+ preporučeno) ili Bun.  
+2. Kloniraj repozitorij i uđi u direktorij:  
+   ```bash
+   git clone <repo-url>
+   cd VIBEVERSE/genre-verse-match
+   ```  
+3. Instaliraj zavisnosti:  
+   ```bash
+   npm install
+   # ili
+   bun install
+   ```  
+4. Pokreni aplikaciju u razvojnom modu:  
+   ```bash
+   npm run dev
+   ```  
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🤝 Contributing  
 
-**Use GitHub Codespaces**
+Ako želiš doprinijeti:  
+- otvori issue ili PR,  
+- piši testove,  
+- ažuriraj dokumentaciju.  
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 📄 Licenca  
 
-This project is built with:
+Dodaj odgovarajuću licencu (npr. MIT, Apache-2.0).  
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/c3d979e1-5411-4a67-b689-3bdbf985a60c) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
