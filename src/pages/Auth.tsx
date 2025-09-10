@@ -87,13 +87,13 @@ const Auth = () => {
 
   const isLoginFormValid = loginData.email.trim() !== "" && loginData.password.trim() !== "";
   
-  const isRegisterFormValid = 
-    registerData.name.trim() !== "" &&
-    registerData.email.trim() !== "" &&
-    registerData.password.trim() !== "" &&
-    registerData.confirmPassword.trim() !== "" &&
-    (userType === "user" || registerData.address.trim() !== "") &&
-    registerData.password === registerData.confirmPassword;
+  const isRegisterFormValid =
+  registerData.name.trim() !== "" &&
+  registerData.email.trim() !== "" &&
+  registerData.password.trim() !== "" &&
+  registerData.confirmPassword.trim() !== "" &&
+  (userType !== "user" ? registerData.address.trim() !== "" : true) &&
+  registerData.password === registerData.confirmPassword;
 
   if (loading) {
     return (
