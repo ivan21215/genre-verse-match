@@ -16,7 +16,7 @@ import EventPromotion from "@/components/EventPromotion";
 import { Link } from "react-router-dom";
 
 const Events = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { events, loading: eventsLoading, fetchAllEvents } = useEvents();
   const { venues, loading: venuesLoading } = useVenues();
   const [selectedEventId, setSelectedEventId] = useState<string>("");
@@ -69,19 +69,23 @@ const Events = () => {
 
           {user ? (
             <Tabs defaultValue="events" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsList className={`grid w-full mb-8 ${profile?.business_type === 'user' ? 'grid-cols-1' : 'grid-cols-3'}`}>
                 <TabsTrigger value="events">
                   <Calendar className="w-4 h-4 mr-2" />
                   All Events
                 </TabsTrigger>
-                <TabsTrigger value="tickets">
-                  <Ticket className="w-4 h-4 mr-2" />
-                  Ticket Manager
-                </TabsTrigger>
-                <TabsTrigger value="promotion">
-                  <Megaphone className="w-4 h-4 mr-2" />
-                  Event Promotion
-                </TabsTrigger>
+                {profile?.business_type !== 'user' && (
+                  <>
+                    <TabsTrigger value="tickets">
+                      <Ticket className="w-4 h-4 mr-2" />
+                      Ticket Manager
+                    </TabsTrigger>
+                    <TabsTrigger value="promotion">
+                      <Megaphone className="w-4 h-4 mr-2" />
+                      Event Promotion
+                    </TabsTrigger>
+                  </>
+                )}
               </TabsList>
 
               <TabsContent value="events" className="space-y-6">
@@ -152,87 +156,111 @@ const Events = () => {
               </TabsContent>
 
               <TabsContent value="tickets" className="space-y-6">
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Ticket Management</h2>
-                    {userEvents.length > 0 ? (
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="event-select">Select Event</Label>
-                          <select
-                            id="event-select"
-                            value={selectedEventId}
-                            onChange={(e) => setSelectedEventId(e.target.value)}
-                            className="w-full mt-2 p-2 border rounded-md bg-background"
-                          >
-                            <option value="">Choose an event...</option>
-                            {userEvents.map((event) => (
-                              <option key={event.id} value={event.id}>
-                                {event.title} - {formatDate(event.event_date)}
-                              </option>
-                            ))}
-                          </select>
+                {profile?.business_type !== 'user' ? (
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-xl font-semibold mb-4">Ticket Management</h2>
+                      {userEvents.length > 0 ? (
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="event-select">Select Event</Label>
+                            <select
+                              id="event-select"
+                              value={selectedEventId}
+                              onChange={(e) => setSelectedEventId(e.target.value)}
+                              className="w-full mt-2 p-2 border rounded-md bg-background"
+                            >
+                              <option value="">Choose an event...</option>
+                              {userEvents.map((event) => (
+                                <option key={event.id} value={event.id}>
+                                  {event.title} - {formatDate(event.event_date)}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {selectedEventId && <TicketManager eventId={selectedEventId} isOwner={true} />}
                         </div>
-                        {selectedEventId && <TicketManager eventId={selectedEventId} isOwner={true} />}
-                      </div>
-                    ) : (
-                      <Card>
-                        <CardContent className="p-6 text-center">
-                          <Ticket className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <h3 className="text-lg font-semibold mb-2">No Events Found</h3>
-                          <p className="text-muted-foreground mb-4">
-                            You need to create events first to manage tickets.
-                          </p>
-                          <Link to="/venues">
-                            <Button>Create Your First Event</Button>
-                          </Link>
-                        </CardContent>
-                      </Card>
-                    )}
+                      ) : (
+                        <Card>
+                          <CardContent className="p-6 text-center">
+                            <Ticket className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                            <h3 className="text-lg font-semibold mb-2">No Events Found</h3>
+                            <p className="text-muted-foreground mb-4">
+                              You need to create events first to manage tickets.
+                            </p>
+                            <Link to="/venues">
+                              <Button>Create Your First Event</Button>
+                            </Link>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <Card>
+                    <CardContent className="p-6 text-center">
+                      <Ticket className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">Feature Not Available</h3>
+                      <p className="text-muted-foreground">
+                        Ticket management is only available for venue and club owners.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
 
               <TabsContent value="promotion" className="space-y-6">
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Event Promotion</h2>
-                    {userEvents.length > 0 ? (
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="promo-event-select">Select Event</Label>
-                          <select
-                            id="promo-event-select"
-                            value={selectedEventId}
-                            onChange={(e) => setSelectedEventId(e.target.value)}
-                            className="w-full mt-2 p-2 border rounded-md bg-background"
-                          >
-                            <option value="">Choose an event...</option>
-                            {userEvents.map((event) => (
-                              <option key={event.id} value={event.id}>
-                                {event.title} - {formatDate(event.event_date)}
-                              </option>
-                            ))}
-                          </select>
+                {profile?.business_type !== 'user' ? (
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-xl font-semibold mb-4">Event Promotion</h2>
+                      {userEvents.length > 0 ? (
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="promo-event-select">Select Event</Label>
+                            <select
+                              id="promo-event-select"
+                              value={selectedEventId}
+                              onChange={(e) => setSelectedEventId(e.target.value)}
+                              className="w-full mt-2 p-2 border rounded-md bg-background"
+                            >
+                              <option value="">Choose an event...</option>
+                              {userEvents.map((event) => (
+                                <option key={event.id} value={event.id}>
+                                  {event.title} - {formatDate(event.event_date)}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {selectedEvent && <EventPromotion event={selectedEvent} />}
                         </div>
-                        {selectedEvent && <EventPromotion event={selectedEvent} />}
-                      </div>
-                    ) : (
-                      <Card>
-                        <CardContent className="p-6 text-center">
-                          <Megaphone className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <h3 className="text-lg font-semibold mb-2">No Events Found</h3>
-                          <p className="text-muted-foreground mb-4">
-                            You need to create events first to promote them.
-                          </p>
-                          <Link to="/venues">
-                            <Button>Create Your First Event</Button>
-                          </Link>
-                        </CardContent>
-                      </Card>
-                    )}
+                      ) : (
+                        <Card>
+                          <CardContent className="p-6 text-center">
+                            <Megaphone className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                            <h3 className="text-lg font-semibold mb-2">No Events Found</h3>
+                            <p className="text-muted-foreground mb-4">
+                              You need to create events first to promote them.
+                            </p>
+                            <Link to="/venues">
+                              <Button>Create Your First Event</Button>
+                            </Link>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <Card>
+                    <CardContent className="p-6 text-center">
+                      <Megaphone className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">Feature Not Available</h3>
+                      <p className="text-muted-foreground">
+                        Event promotion is only available for venue and club owners.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
             </Tabs>
           ) : (

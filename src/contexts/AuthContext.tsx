@@ -7,7 +7,7 @@ interface Profile {
   id: string;
   user_id: string;
   name: string;
-  business_type: 'venue' | 'club' | null;
+  business_type: 'venue' | 'club' | 'user' | null;
   address: string | null;
   created_at: string;
   updated_at: string;
@@ -18,7 +18,8 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signUp: (email: string, password: string, name: string, businessType: 'venue' | 'club', address: string) => Promise<{ error: any }>;
+  isVenueOwner: boolean;
+  signUp: (email: string, password: string, name: string, userType: 'venue' | 'club' | 'user', address: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>;
@@ -40,6 +41,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  // Check if user is a venue owner (can create venues/events)
+  const isVenueOwner = profile?.business_type === 'venue' || profile?.business_type === 'club';
 
   useEffect(() => {
     // Set up auth state listener
@@ -89,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, name: string, businessType: 'venue' | 'club', address: string) => {
+  const signUp = async (email: string, password: string, name: string, userType: 'venue' | 'club' | 'user', address: string) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -97,8 +101,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         emailRedirectTo: `${window.location.origin}/`,
         data: {
           name,
-          business_type: businessType,
-          address
+          business_type: userType,
+          address: userType === 'user' ? null : address
         }
       }
     });
@@ -160,6 +164,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     profile,
     loading,
+    isVenueOwner,
     signUp,
     signIn,
     signOut,

@@ -13,7 +13,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const { signUp, signIn, user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
-  const [businessType, setBusinessType] = useState<"venue" | "club">("venue");
+  const [userType, setUserType] = useState<"user" | "venue" | "club">("user");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [loginData, setLoginData] = useState({
@@ -78,7 +78,7 @@ const Auth = () => {
       registerData.email,
       registerData.password,
       registerData.name,
-      businessType,
+      userType,
       registerData.address
     );
     
@@ -92,7 +92,7 @@ const Auth = () => {
     registerData.email.trim() !== "" &&
     registerData.password.trim() !== "" &&
     registerData.confirmPassword.trim() !== "" &&
-    registerData.address.trim() !== "" &&
+    (userType === "user" || registerData.address.trim() !== "") &&
     registerData.password === registerData.confirmPassword;
 
   if (loading) {
@@ -111,12 +111,14 @@ const Auth = () => {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-2xl text-center">
-              {activeTab === "login" ? "Login" : "Register"} as a {businessType === "venue" ? "Venue" : "Club"}
+              {activeTab === "login" ? "Login" : "Register"}
             </CardTitle>
             <CardDescription className="text-center">
               {activeTab === "login" 
-                ? "Enter your credentials to access your dashboard" 
-                : "Create an account to list your location and events"}
+                ? "Enter your credentials to access your account" 
+                : userType === "user"
+                ? "Create an account to discover venues and events"
+                : `Create an account to list your ${userType} and events`}
             </CardDescription>
           </CardHeader>
           
@@ -133,14 +135,25 @@ const Auth = () => {
             </div>
             
             <CardContent>
-              <div className="mb-4">
-                <Tabs defaultValue={businessType} onValueChange={(v) => setBusinessType(v as "venue" | "club")}>
-                  <TabsList className="grid grid-cols-2 w-full">
-                    <TabsTrigger value="venue">Venue</TabsTrigger>
-                    <TabsTrigger value="club">Club</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
+              {activeTab === "register" && (
+                <div className="mb-6">
+                  <Label className="text-sm font-medium">Account Type</Label>
+                  <Tabs defaultValue={userType} onValueChange={(v) => setUserType(v as "user" | "venue" | "club")} className="mt-2">
+                    <TabsList className="grid grid-cols-3 w-full">
+                      <TabsTrigger value="user">User</TabsTrigger>
+                      <TabsTrigger value="venue">Venue</TabsTrigger>
+                      <TabsTrigger value="club">Club</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {userType === "user" 
+                      ? "Browse venues and events, mark favorites" 
+                      : userType === "venue"
+                      ? "List venues and create events"
+                      : "List clubs and manage events"}
+                  </p>
+                </div>
+              )}
               
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
@@ -191,13 +204,15 @@ const Auth = () => {
               <TabsContent value="register">
                 <form onSubmit={handleRegister} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">{businessType === "venue" ? "Venue" : "Club"} Name</Label>
+                    <Label htmlFor="name">
+                      {userType === "user" ? "Full Name" : `${userType === "venue" ? "Venue" : "Club"} Name`}
+                    </Label>
                     <div className="relative">
-                      <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="name"
                         name="name"
-                        placeholder="Enter your business name"
+                        placeholder={userType === "user" ? "Enter your full name" : "Enter your business name"}
                         className="pl-10"
                         value={registerData.name}
                         onChange={handleRegisterChange}
@@ -206,21 +221,23 @@ const Auth = () => {
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Address</Label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="address"
-                        name="address"
-                        placeholder="123 Main St, City"
-                        className="pl-10"
-                        value={registerData.address}
-                        onChange={handleRegisterChange}
-                        required
-                      />
+                  {userType !== "user" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Address</Label>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="address"
+                          name="address"
+                          placeholder="123 Main St, City"
+                          className="pl-10"
+                          value={registerData.address}
+                          onChange={handleRegisterChange}
+                          required={userType !== "user"}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
                   
                   <div className="space-y-2">
                     <Label htmlFor="reg-email">Email</Label>
