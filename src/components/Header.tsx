@@ -44,6 +44,9 @@ const Header = () => {
               <Link to="/venues">
                 <Button variant="ghost" className="text-foreground hover:text-primary">Venues</Button>
               </Link>
+              <Link to="/analytics">
+                <Button variant="ghost" className="text-foreground hover:text-primary">Analytics</Button>
+              </Link>
               <Link to="/favorites">
                 <Button variant="ghost" className="text-foreground hover:text-primary">Favorites</Button>
               </Link>
@@ -105,6 +108,9 @@ const Header = () => {
               <>
                 <Link to="/venues" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start text-foreground hover:text-primary">Venues</Button>
+                </Link>
+                <Link to="/analytics" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start text-foreground hover:text-primary">Analytics</Button>
                 </Link>
                 <Link to="/favorites" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start text-foreground hover:text-primary">Favorites</Button>

@@ -12,6 +12,7 @@ import Map from "./pages/Map";
 import Profile from "./pages/Profile";
 import Venues from "./pages/Venues";
 import Subscriptions from "./pages/Subscriptions";
+import Analytics from "./pages/Analytics";
 import Favorites from "./pages/Favorites";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/venues" element={<Venues />} />
             <Route path="/subscriptions" element={<Subscriptions />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/auth" element={<Auth />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
