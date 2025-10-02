@@ -332,6 +332,45 @@ export type Database = {
           },
         ]
       }
+      user_event_preferences: {
+        Row: {
+          additional_info: string | null
+          age: number
+          created_at: string
+          event_date: string
+          event_location: string
+          gender: string
+          genre: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_info?: string | null
+          age: number
+          created_at?: string
+          event_date: string
+          event_location: string
+          gender: string
+          genre: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_info?: string | null
+          age?: number
+          created_at?: string
+          event_date?: string
+          event_location?: string
+          gender?: string
+          genre?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string

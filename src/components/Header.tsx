@@ -41,6 +41,9 @@ const Header = () => {
           </Link>
           {user && (
             <>
+              <Link to="/find-matches">
+                <Button variant="ghost" className="text-foreground hover:text-primary">Find Matches</Button>
+              </Link>
               {profile?.business_type !== 'user' && (
                 <>
                   <Link to="/venues">
@@ -110,6 +113,9 @@ const Header = () => {
             </Link>
             {user && (
               <>
+                <Link to="/find-matches" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start text-foreground hover:text-primary">Find Matches</Button>
+                </Link>
                 {profile?.business_type !== 'user' && (
                   <>
                     <Link to="/venues" onClick={() => setIsMenuOpen(false)}>
