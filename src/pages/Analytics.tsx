@@ -4,8 +4,10 @@ import { useVenues } from "@/hooks/useVenues";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RevenueAnalytics from "@/components/RevenueAnalytics";
+import SpotifyGenreAnalytics from "@/components/SpotifyGenreAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigate } from "react-router-dom";
 import { BarChart3, DollarSign, TrendingUp } from "lucide-react";
 
@@ -50,10 +52,10 @@ const Analytics = () => {
             <div>
               <h1 className="text-3xl font-bold flex items-center gap-2">
                 <BarChart3 className="h-8 w-8 text-primary" />
-                Revenue Analytics
+                Analytics Dashboard
               </h1>
               <p className="text-muted-foreground mt-2">
-                Track your venue performance and ticket sales
+                Track venue performance, ticket sales, and Spotify trends
               </p>
             </div>
           </div>
@@ -88,12 +90,25 @@ const Analytics = () => {
                 <DollarSign className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No Venues Found</h3>
                 <p className="text-muted-foreground mb-4">
-                  You need to create a venue first to see analytics data.
+                  You need to create a venue first to see revenue analytics data.
                 </p>
               </CardContent>
             </Card>
           ) : (
-            <RevenueAnalytics venueId={selectedVenue || undefined} />
+            <Tabs defaultValue="revenue" className="space-y-6">
+              <TabsList>
+                <TabsTrigger value="revenue">Revenue Analytics</TabsTrigger>
+                <TabsTrigger value="spotify">Spotify Trends</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="revenue">
+                <RevenueAnalytics venueId={selectedVenue || undefined} />
+              </TabsContent>
+              
+              <TabsContent value="spotify">
+                <SpotifyGenreAnalytics />
+              </TabsContent>
+            </Tabs>
           )}
 
           {/* Tips Section */}
