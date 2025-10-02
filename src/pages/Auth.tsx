@@ -226,15 +226,15 @@ const Auth = () => {
                       <Label htmlFor="address">Address</Label>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="address"
-                          name="address"
-                          placeholder="123 Main St, City"
-                          className="pl-10"
-                          value={registerData.address}
-                          onChange={handleRegisterChange}
-                          required={userType !== "user"}
-                        />
+                      <Input
+                        id="address"
+                        name="address"
+                        placeholder="123 Main St, City"
+                        className="pl-10"
+                        value={registerData.address}
+                        onChange={handleRegisterChange}
+                        required
+                      />
                       </div>
                     </div>
                   )}
