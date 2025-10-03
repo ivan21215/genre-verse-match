@@ -44,6 +44,9 @@ const Header = () => {
               <Link to="/find-matches">
                 <Button variant="ghost" className="text-foreground hover:text-primary">Find Matches</Button>
               </Link>
+              <Link to="/chats">
+                <Button variant="ghost" className="text-foreground hover:text-primary">Messages</Button>
+              </Link>
               {profile?.business_type !== 'user' && (
                 <>
                   <Link to="/venues">
@@ -115,6 +118,9 @@ const Header = () => {
               <>
                 <Link to="/find-matches" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start text-foreground hover:text-primary">Find Matches</Button>
+                </Link>
+                <Link to="/chats" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start text-foreground hover:text-primary">Messages</Button>
                 </Link>
                 {profile?.business_type !== 'user' && (
                   <>

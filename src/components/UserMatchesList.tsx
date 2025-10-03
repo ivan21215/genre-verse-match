@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { UserMatch } from '@/hooks/useUserMatching';
 import { Users, MapPin, Calendar, Music, User as UserIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import ChatRequestButton from '@/components/ChatRequestButton';
 
 interface UserMatchesListProps {
   matches: UserMatch[];
@@ -92,6 +93,10 @@ const UserMatchesList = ({ matches, loading, onFindMatches, hasPreference }: Use
                         <p className="text-sm text-muted-foreground">{match.additional_info}</p>
                       </div>
                     )}
+
+                    <div className="pt-3 border-t">
+                      <ChatRequestButton userId={match.user_id} />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
