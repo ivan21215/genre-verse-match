@@ -80,7 +80,11 @@ export type Database = {
           id: string
           status: string
           updated_at: string
+          user_city: string | null
           user_id: string
+          user_latitude: number | null
+          user_longitude: number | null
+          user_region: string | null
         }
         Insert: {
           created_at?: string
@@ -88,7 +92,11 @@ export type Database = {
           id?: string
           status?: string
           updated_at?: string
+          user_city?: string | null
           user_id: string
+          user_latitude?: number | null
+          user_longitude?: number | null
+          user_region?: string | null
         }
         Update: {
           created_at?: string
@@ -96,7 +104,11 @@ export type Database = {
           id?: string
           status?: string
           updated_at?: string
+          user_city?: string | null
           user_id?: string
+          user_latitude?: number | null
+          user_longitude?: number | null
+          user_region?: string | null
         }
         Relationships: [
           {
@@ -242,7 +254,11 @@ export type Database = {
           id: string
           rating: number
           updated_at: string
+          user_city: string | null
           user_id: string
+          user_latitude: number | null
+          user_longitude: number | null
+          user_region: string | null
           venue_id: string
         }
         Insert: {
@@ -251,7 +267,11 @@ export type Database = {
           id?: string
           rating: number
           updated_at?: string
+          user_city?: string | null
           user_id: string
+          user_latitude?: number | null
+          user_longitude?: number | null
+          user_region?: string | null
           venue_id: string
         }
         Update: {
@@ -260,7 +280,11 @@ export type Database = {
           id?: string
           rating?: number
           updated_at?: string
+          user_city?: string | null
           user_id?: string
+          user_latitude?: number | null
+          user_longitude?: number | null
+          user_region?: string | null
           venue_id?: string
         }
         Relationships: []
@@ -497,6 +521,7 @@ export type Database = {
       venues: {
         Row: {
           address: string
+          city: string | null
           created_at: string
           distance: string | null
           genre: string
@@ -506,6 +531,7 @@ export type Database = {
           longitude: number | null
           name: string
           owner_id: string
+          region: string | null
           subscription_plan: string | null
           updated_at: string
           venue_code: string | null
@@ -513,6 +539,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          city?: string | null
           created_at?: string
           distance?: string | null
           genre: string
@@ -522,6 +549,7 @@ export type Database = {
           longitude?: number | null
           name: string
           owner_id: string
+          region?: string | null
           subscription_plan?: string | null
           updated_at?: string
           venue_code?: string | null
@@ -529,6 +557,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          city?: string | null
           created_at?: string
           distance?: string | null
           genre?: string
@@ -538,6 +567,7 @@ export type Database = {
           longitude?: number | null
           name?: string
           owner_id?: string
+          region?: string | null
           subscription_plan?: string | null
           updated_at?: string
           venue_code?: string | null
@@ -550,7 +580,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_distance: {
+        Args: { lat1: number; lat2: number; lon1: number; lon2: number }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
