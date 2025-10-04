@@ -42,6 +42,29 @@ export const useRSVP = () => {
     }
   };
 
+  const getUserLocation = async (): Promise<{ latitude: number; longitude: number } | null> => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve(null);
+        return;
+      }
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.warn('Could not get user location:', error);
+          resolve(null);
+        },
+        { timeout: 5000, enableHighAccuracy: false }
+      );
+    });
+  };
+
   const updateRSVP = async (eventId: string, status: 'going' | 'maybe' | 'not_going') => {
     if (!user) {
       toast({
@@ -53,13 +76,23 @@ export const useRSVP = () => {
     }
 
     try {
+      // Try to get user's location
+      const location = await getUserLocation();
+      
+      const rsvpData: any = {
+        user_id: user.id,
+        event_id: eventId,
+        status: status
+      };
+
+      if (location) {
+        rsvpData.user_latitude = location.latitude;
+        rsvpData.user_longitude = location.longitude;
+      }
+
       const { error } = await supabase
         .from('event_rsvps')
-        .upsert({
-          user_id: user.id,
-          event_id: eventId,
-          status: status
-        });
+        .upsert(rsvpData);
 
       if (error) throw error;
       

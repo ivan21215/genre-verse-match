@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RevenueAnalytics from "@/components/RevenueAnalytics";
 import SpotifyGenreAnalytics from "@/components/SpotifyGenreAnalytics";
+import RegionalAnalytics from "@/components/RegionalAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -98,11 +99,16 @@ const Analytics = () => {
             <Tabs defaultValue="revenue" className="space-y-6">
               <TabsList>
                 <TabsTrigger value="revenue">Revenue Analytics</TabsTrigger>
+                <TabsTrigger value="regional">Regional Insights</TabsTrigger>
                 <TabsTrigger value="spotify">Spotify Trends</TabsTrigger>
               </TabsList>
               
               <TabsContent value="revenue">
                 <RevenueAnalytics venueId={selectedVenue || undefined} />
+              </TabsContent>
+              
+              <TabsContent value="regional">
+                <RegionalAnalytics venueId={selectedVenue || undefined} />
               </TabsContent>
               
               <TabsContent value="spotify">

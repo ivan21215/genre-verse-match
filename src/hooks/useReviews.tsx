@@ -44,6 +44,29 @@ export const useReviews = (venueId?: string) => {
     }
   };
 
+  const getUserLocation = async (): Promise<{ latitude: number; longitude: number } | null> => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve(null);
+        return;
+      }
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.warn('Could not get user location:', error);
+          resolve(null);
+        },
+        { timeout: 5000, enableHighAccuracy: false }
+      );
+    });
+  };
+
   const createReview = async (venueId: string, rating: number, comment?: string) => {
     if (!user) {
       toast({
@@ -55,14 +78,24 @@ export const useReviews = (venueId?: string) => {
     }
     
     try {
+      // Try to get user's location
+      const location = await getUserLocation();
+      
+      const reviewData: any = {
+        user_id: user.id,
+        venue_id: venueId,
+        rating,
+        comment: comment || null
+      };
+
+      if (location) {
+        reviewData.user_latitude = location.latitude;
+        reviewData.user_longitude = location.longitude;
+      }
+
       const { data, error } = await supabase
         .from('reviews')
-        .insert([{
-          user_id: user.id,
-          venue_id: venueId,
-          rating,
-          comment: comment || null
-        }])
+        .insert([reviewData])
         .select('*')
         .single();
         
