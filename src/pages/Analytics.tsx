@@ -9,13 +9,38 @@ import RegionalAnalytics from "@/components/RegionalAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { Navigate } from "react-router-dom";
-import { BarChart3, DollarSign, TrendingUp } from "lucide-react";
+import { BarChart3, DollarSign, TrendingUp, Calendar } from "lucide-react";
+import { subDays, subMonths, startOfWeek, startOfMonth, startOfQuarter } from "date-fns";
 
 const Analytics = () => {
   const { user, loading: authLoading } = useAuth();
   const { venues, loading: venuesLoading } = useVenues();
   const [selectedVenue, setSelectedVenue] = React.useState<string>("");
+  const [dateRange, setDateRange] = React.useState<{ start: Date | null; end: Date | null }>({
+    start: null,
+    end: null,
+  });
+
+  const handleTimeRangeChange = (range: string) => {
+    const now = new Date();
+    switch (range) {
+      case "week":
+        setDateRange({ start: startOfWeek(now), end: now });
+        break;
+      case "month":
+        setDateRange({ start: startOfMonth(now), end: now });
+        break;
+      case "quarter":
+        setDateRange({ start: startOfQuarter(now), end: now });
+        break;
+      case "all":
+      default:
+        setDateRange({ start: null, end: null });
+        break;
+    }
+  };
 
   if (authLoading || venuesLoading) {
     return (
@@ -61,29 +86,74 @@ const Analytics = () => {
             </div>
           </div>
 
-          {/* Venue Filter */}
-          {userVenues.length > 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Filter by Venue</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Select value={selectedVenue} onValueChange={setSelectedVenue}>
-                  <SelectTrigger className="w-64">
-                    <SelectValue placeholder="All venues" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All venues</SelectItem>
-                    {userVenues.map((venue) => (
-                      <SelectItem key={venue.id} value={venue.id}>
-                        {venue.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
-          )}
+          {/* Filters */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Filters</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col md:flex-row gap-4">
+                {userVenues.length > 1 && (
+                  <div className="flex-1">
+                    <label className="text-sm font-medium mb-2 block">Venue</label>
+                    <Select value={selectedVenue} onValueChange={setSelectedVenue}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All venues" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">All venues</SelectItem>
+                        {userVenues.map((venue) => (
+                          <SelectItem key={venue.id} value={venue.id}>
+                            {venue.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <div className="flex-1">
+                  <label className="text-sm font-medium mb-2 block">Time Range</label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleTimeRangeChange("week")}
+                      className="flex-1"
+                    >
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Week
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleTimeRangeChange("month")}
+                      className="flex-1"
+                    >
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Month
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleTimeRangeChange("quarter")}
+                      className="flex-1"
+                    >
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Quarter
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleTimeRangeChange("all")}
+                      className="flex-1"
+                    >
+                      All Time
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {userVenues.length === 0 ? (
             <Card>
@@ -104,11 +174,19 @@ const Analytics = () => {
               </TabsList>
               
               <TabsContent value="revenue">
-                <RevenueAnalytics venueId={selectedVenue || undefined} />
+                <RevenueAnalytics 
+                  venueId={selectedVenue || undefined}
+                  startDate={dateRange.start || undefined}
+                  endDate={dateRange.end || undefined}
+                />
               </TabsContent>
               
               <TabsContent value="regional">
-                <RegionalAnalytics venueId={selectedVenue || undefined} />
+                <RegionalAnalytics 
+                  venueId={selectedVenue || undefined}
+                  startDate={dateRange.start || undefined}
+                  endDate={dateRange.end || undefined}
+                />
               </TabsContent>
               
               <TabsContent value="spotify">

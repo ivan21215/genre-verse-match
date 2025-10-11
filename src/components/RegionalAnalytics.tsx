@@ -7,11 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 interface RegionalAnalyticsProps {
   venueId?: string;
+  startDate?: Date;
+  endDate?: Date;
 }
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', '#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#a48dd1'];
 
-const RegionalAnalytics: React.FC<RegionalAnalyticsProps> = ({ venueId }) => {
+const RegionalAnalytics: React.FC<RegionalAnalyticsProps> = ({ venueId, startDate, endDate }) => {
   const [maxDistance, setMaxDistance] = useState<number>(50);
   const {
     loading,
@@ -19,11 +21,11 @@ const RegionalAnalytics: React.FC<RegionalAnalyticsProps> = ({ venueId }) => {
     rsvpsByRegion,
     venueLocation,
     fetchRegionalAnalytics
-  } = useRegionalAnalytics(venueId, maxDistance);
+  } = useRegionalAnalytics(venueId, maxDistance, startDate, endDate);
 
   React.useEffect(() => {
-    fetchRegionalAnalytics(venueId);
-  }, [venueId, maxDistance]);
+    fetchRegionalAnalytics(venueId, startDate, endDate);
+  }, [venueId, maxDistance, startDate, endDate]);
 
   if (loading) {
     return (

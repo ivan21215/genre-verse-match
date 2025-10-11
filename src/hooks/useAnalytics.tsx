@@ -25,7 +25,7 @@ export const useAnalytics = () => {
   const [totalTicketsSold, setTotalTicketsSold] = useState(0);
   const [totalEvents, setTotalEvents] = useState(0);
 
-  const fetchVenueAnalytics = async (venueId?: string) => {
+  const fetchVenueAnalytics = async (venueId?: string, startDate?: Date, endDate?: Date) => {
     if (!user) return;
     
     try {
@@ -49,6 +49,14 @@ export const useAnalytics = () => {
 
       if (venueId) {
         query = query.eq('events.venue_id', venueId);
+      }
+
+      if (startDate) {
+        query = query.gte('created_at', startDate.toISOString());
+      }
+
+      if (endDate) {
+        query = query.lte('created_at', endDate.toISOString());
       }
 
       const { data: purchases, error: purchasesError } = await query;

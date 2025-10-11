@@ -28,14 +28,19 @@ export interface RSVPsByRegion {
   distance: number;
 }
 
-export const useRegionalAnalytics = (venueId?: string, maxDistanceKm: number = 50) => {
+export const useRegionalAnalytics = (
+  venueId?: string, 
+  maxDistanceKm: number = 50,
+  startDate?: Date,
+  endDate?: Date
+) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [reviewsByRegion, setReviewsByRegion] = useState<ReviewsByRegion[]>([]);
   const [rsvpsByRegion, setRSVPsByRegion] = useState<RSVPsByRegion[]>([]);
   const [venueLocation, setVenueLocation] = useState<{ lat: number; lng: number } | null>(null);
 
-  const fetchRegionalAnalytics = async (selectedVenueId?: string) => {
+  const fetchRegionalAnalytics = async (selectedVenueId?: string, filterStartDate?: Date, filterEndDate?: Date) => {
     if (!user) return;
     
     try {
@@ -73,15 +78,25 @@ export const useRegionalAnalytics = (venueId?: string, maxDistanceKm: number = 5
       });
 
       // Fetch reviews with location data for this venue
-      const { data: reviews, error: reviewsError } = await supabase
+      let reviewsQuery = supabase
         .from('reviews')
-        .select('user_city, user_region, user_latitude, user_longitude, rating')
+        .select('user_city, user_region, user_latitude, user_longitude, rating, created_at')
         .eq('venue_id', targetVenue.id);
+
+      if (filterStartDate) {
+        reviewsQuery = reviewsQuery.gte('created_at', filterStartDate.toISOString());
+      }
+
+      if (filterEndDate) {
+        reviewsQuery = reviewsQuery.lte('created_at', filterEndDate.toISOString());
+      }
+
+      const { data: reviews, error: reviewsError } = await reviewsQuery;
       
       if (reviewsError) throw reviewsError;
 
       // Fetch RSVPs with location data for events at this venue
-      const { data: rsvps, error: rsvpsError } = await supabase
+      let rsvpsQuery = supabase
         .from('event_rsvps')
         .select(`
           user_city,
@@ -89,9 +104,20 @@ export const useRegionalAnalytics = (venueId?: string, maxDistanceKm: number = 5
           user_latitude,
           user_longitude,
           status,
+          created_at,
           events!inner(venue_id)
         `)
         .eq('events.venue_id', targetVenue.id);
+
+      if (filterStartDate) {
+        rsvpsQuery = rsvpsQuery.gte('created_at', filterStartDate.toISOString());
+      }
+
+      if (filterEndDate) {
+        rsvpsQuery = rsvpsQuery.lte('created_at', filterEndDate.toISOString());
+      }
+
+      const { data: rsvps, error: rsvpsError } = await rsvpsQuery;
       
       if (rsvpsError) throw rsvpsError;
 
@@ -200,9 +226,9 @@ export const useRegionalAnalytics = (venueId?: string, maxDistanceKm: number = 5
 
   useEffect(() => {
     if (user) {
-      fetchRegionalAnalytics(venueId);
+      fetchRegionalAnalytics(venueId, startDate, endDate);
     }
-  }, [user, venueId]);
+  }, [user, venueId, startDate, endDate]);
 
   return {
     loading,

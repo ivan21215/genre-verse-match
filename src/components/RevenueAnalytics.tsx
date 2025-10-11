@@ -6,20 +6,23 @@ import { DollarSign, Ticket, Calendar, TrendingUp } from 'lucide-react';
 
 interface RevenueAnalyticsProps {
   venueId?: string;
+  startDate?: Date;
+  endDate?: Date;
 }
 
-const RevenueAnalytics: React.FC<RevenueAnalyticsProps> = ({ venueId }) => {
+const RevenueAnalytics: React.FC<RevenueAnalyticsProps> = ({ venueId, startDate, endDate }) => {
   const {
     loading,
     revenueData,
     totalRevenue,
     totalTicketsSold,
-    totalEvents
+    totalEvents,
+    fetchVenueAnalytics
   } = useAnalytics();
 
   React.useEffect(() => {
-    // This will be called when the hook initializes
-  }, [venueId]);
+    fetchVenueAnalytics(venueId, startDate, endDate);
+  }, [venueId, startDate, endDate]);
 
   if (loading) {
     return (
