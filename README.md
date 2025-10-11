@@ -62,15 +62,3 @@ VIBEVERSE connects music lovers and clubs through voting, events, and an interac
 
 ---
 
-## 🤝 Contributing  
-
-If you’d like to contribute:  
-- open an issue or PR,  
-- write tests,  
-- update documentation.  
-
----
-
-## 📄 License  
-
-Add an appropriate license (e.g. MIT, Apache-2.0).  
