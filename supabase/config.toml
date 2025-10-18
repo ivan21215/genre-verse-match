@@ -61,6 +61,9 @@ verify_jwt = true
 [functions.spotify-genre-analytics]
 verify_jwt = true
 
+[functions.send-auth-email]
+verify_jwt = false
+
 [edge-runtime]
 enabled = true
 policy = "per_request"
