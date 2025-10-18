@@ -8,13 +8,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Lock, Mail, User, Building, MapPin } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
   const navigate = useNavigate();
   const { signUp, signIn, user, loading } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [userType, setUserType] = useState<"user" | "venue" | "club">("user");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   
   const [loginData, setLoginData] = useState({
     email: "",
@@ -28,6 +31,27 @@ const Auth = () => {
     confirmPassword: "",
     address: ""
   });
+
+  // Password validation function
+  const validatePassword = (password: string): string[] => {
+    const errors: string[] = [];
+    if (password.length < 8) {
+      errors.push("Password must be at least 8 characters");
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push("Password needs at least one uppercase letter");
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push("Password needs at least one lowercase letter");
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push("Password needs at least one number");
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push("Password needs at least one special character");
+    }
+    return errors;
+  };
 
   // Redirect if already logged in
   useEffect(() => {
@@ -44,6 +68,12 @@ const Auth = () => {
   const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setRegisterData(prev => ({ ...prev, [name]: value }));
+    
+    // Validate password in real-time
+    if (name === "password") {
+      const errors = validatePassword(value);
+      setPasswordErrors(errors);
+    }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -67,8 +97,24 @@ const Auth = () => {
     
     if (isSubmitting) return;
     
-    // Basic validation
+    // Validate password
+    const errors = validatePassword(registerData.password);
+    if (errors.length > 0) {
+      toast({
+        title: "Password Requirements",
+        description: errors.join(". "),
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Check if passwords match
     if (registerData.password !== registerData.confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -93,7 +139,8 @@ const Auth = () => {
   registerData.password.trim() !== "" &&
   registerData.confirmPassword.trim() !== "" &&
   (userType !== "user" ? registerData.address.trim() !== "" : true) &&
-  registerData.password === registerData.confirmPassword;
+  registerData.password === registerData.confirmPassword &&
+  passwordErrors.length === 0;
 
   if (loading) {
     return (
@@ -271,6 +318,16 @@ const Auth = () => {
                         required
                       />
                     </div>
+                    {registerData.password && passwordErrors.length > 0 && (
+                      <div className="text-xs text-destructive space-y-1">
+                        {passwordErrors.map((error, index) => (
+                          <p key={index}>• {error}</p>
+                        ))}
+                      </div>
+                    )}
+                    {registerData.password && passwordErrors.length === 0 && (
+                      <p className="text-xs text-green-600">✓ Password meets all requirements</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">

@@ -130,9 +130,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     
     if (error) {
+      let errorMessage = error.message;
+      
+      // Provide more specific error messages
+      if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Invalid email or password. If you just signed up, please check your email to confirm your account first.";
+      } else if (error.message.includes("Email not confirmed")) {
+        errorMessage = "Please check your email and confirm your account before signing in.";
+      }
+      
       toast({
         title: "Sign In Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }
