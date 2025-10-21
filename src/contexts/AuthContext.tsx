@@ -40,10 +40,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isVenueOwner, setIsVenueOwner] = useState(false);
   const { toast } = useToast();
-
-  // Check if user is a venue owner (can create venues/events)
-  const isVenueOwner = profile?.business_type === 'venue' || profile?.business_type === 'club';
 
   useEffect(() => {
     // Set up auth state listener
@@ -61,9 +59,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               .eq('user_id', session.user.id)
               .single();
             setProfile(profileData as Profile);
+            
+            // Fetch user roles to determine if user is a venue owner
+            const { data: rolesData } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', session.user.id);
+            
+            const hasVenueOwnerRole = rolesData?.some(r => r.role === 'venue_owner') ?? false;
+            setIsVenueOwner(hasVenueOwnerRole);
           }, 0);
         } else {
           setProfile(null);
+          setIsVenueOwner(false);
         }
         
         setLoading(false);
@@ -76,15 +84,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single()
-          .then(({ data: profileData }) => {
-            setProfile(profileData as Profile);
-            setLoading(false);
-          });
+        Promise.all([
+          supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single(),
+          supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+        ]).then(([{ data: profileData }, { data: rolesData }]) => {
+          setProfile(profileData as Profile);
+          const hasVenueOwnerRole = rolesData?.some(r => r.role === 'venue_owner') ?? false;
+          setIsVenueOwner(hasVenueOwnerRole);
+          setLoading(false);
+        });
       } else {
         setLoading(false);
       }
