@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import GenreExplorer from "@/components/GenreExplorer";
@@ -8,17 +8,13 @@ import MapView from "@/components/MapView";
 import ProfileSetup from "@/components/ProfileSetup";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { isUserLoggedIn } from "@/utils/authUtils";
+import { useAuth } from "@/contexts/AuthContext";
 import { useVenues } from "@/hooks/useVenues";
 
 const Index = () => {
   const [selectedGenre, setSelectedGenre] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user } = useAuth();
   const { venues, loading } = useVenues();
-  
-  useEffect(() => {
-    setIsLoggedIn(isUserLoggedIn());
-  }, []);
   
   // Get a sample of venues for homepage display
   const sampleVenues = venues.slice(0, 4);
@@ -41,16 +37,16 @@ const Index = () => {
                 Discover nightlife venues that match your music taste, connect with like-minded people, and create unforgettable memories.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/discover">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90">
-                    Get Started
-                  </Button>
-                </Link>
-                <Link to={isLoggedIn ? "/venues" : "/auth"}>
-                  <Button size="lg" variant="outline">
-                    {isLoggedIn ? "Go to Dashboard" : "For Venues & Clubs"}
-                  </Button>
-                </Link>
+              <Link to="/discover">
+                <Button size="lg" className="bg-primary hover:bg-primary/90">
+                  Get Started
+                </Button>
+              </Link>
+              <Link to={user ? "/venues" : "/auth"}>
+                <Button size="lg" variant="outline">
+                  {user ? "Go to Dashboard" : "For Venues & Clubs"}
+                </Button>
+              </Link>
               </div>
             </div>
             <div className="w-full md:w-1/2 flex justify-center">

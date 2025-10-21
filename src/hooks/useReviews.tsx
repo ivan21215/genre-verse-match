@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { z } from 'zod';
+
+const reviewSchema = z.object({
+  rating: z.number().int().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
+  comment: z.string().trim().max(1000, "Comment must be less than 1000 characters").optional(),
+});
 
 export interface Review {
   id: string;
@@ -78,6 +84,17 @@ export const useReviews = (venueId?: string) => {
     }
     
     try {
+      // Validate inputs
+      const validation = reviewSchema.safeParse({ rating, comment });
+      if (!validation.success) {
+        const errorMessage = validation.error.errors[0].message;
+        toast({
+          title: "Invalid Input",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return { data: null, error: errorMessage };
+      }
       // Try to get user's location
       const location = await getUserLocation();
       
@@ -121,6 +138,18 @@ export const useReviews = (venueId?: string) => {
 
   const updateReview = async (reviewId: string, rating: number, comment?: string) => {
     try {
+      // Validate inputs
+      const validation = reviewSchema.safeParse({ rating, comment });
+      if (!validation.success) {
+        const errorMessage = validation.error.errors[0].message;
+        toast({
+          title: "Invalid Input",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return { data: null, error: errorMessage };
+      }
+      
       const { data, error } = await supabase
         .from('reviews')
         .update({

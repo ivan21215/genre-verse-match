@@ -2,6 +2,16 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { z } from 'zod';
+
+const preferenceSchema = z.object({
+  genre: z.string().trim().min(1, "Genre is required").max(100, "Genre must be less than 100 characters"),
+  age: z.number().int().min(13, "Age must be at least 13").max(120, "Age must be realistic"),
+  gender: z.string().trim().min(1, "Gender is required").max(50, "Gender must be less than 50 characters"),
+  event_location: z.string().trim().min(1, "Location is required").max(200, "Location must be less than 200 characters"),
+  event_date: z.string().trim().min(1, "Event date is required"),
+  additional_info: z.string().trim().max(500, "Additional info must be less than 500 characters").optional(),
+});
 
 export interface UserPreference {
   id: string;
@@ -58,6 +68,17 @@ export const useUserMatching = () => {
 
     setLoading(true);
     try {
+      // Validate inputs
+      const validation = preferenceSchema.safeParse(preference);
+      if (!validation.success) {
+        const errorMessage = validation.error.errors[0].message;
+        toast({
+          title: "Invalid Input",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return { error: new Error(errorMessage) };
+      }
       // Check if user already has a preference
       const { data: existing } = await supabase
         .from('user_event_preferences')

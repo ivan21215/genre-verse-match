@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { z } from 'zod';
+
+const messageSchema = z.object({
+  message: z.string().trim().min(1, "Message cannot be empty").max(2000, "Message must be less than 2000 characters"),
+});
 
 export interface ChatRequest {
   id: string;
@@ -240,6 +245,18 @@ export const useChatMessages = (requestId: string | null) => {
     if (!user || !requestId) return { error: 'Not authenticated or no chat selected' };
 
     try {
+      // Validate input
+      const validation = messageSchema.safeParse({ message });
+      if (!validation.success) {
+        const errorMessage = validation.error.errors[0].message;
+        toast({
+          title: "Invalid Input",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return { error: errorMessage };
+      }
+      
       const { error } = await supabase
         .from('chat_messages')
         .insert({
