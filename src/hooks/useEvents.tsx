@@ -1,6 +1,19 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { z } from 'zod';
+
+const eventSchema = z.object({
+  title: z.string().trim().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
+  description: z.string().trim().max(2000, 'Description must be less than 2000 characters').optional().or(z.literal('')),
+  event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
+  start_time: z.string().regex(/^\d{2}:\d{2}$/, 'Invalid time format (HH:MM)'),
+  end_time: z.string().regex(/^\d{2}:\d{2}$/, 'Invalid time format (HH:MM)').optional().or(z.literal('')),
+  genre: z.string().trim().min(1, 'Genre is required').max(100, 'Genre must be less than 100 characters'),
+  venue_id: z.string().uuid('Invalid venue ID'),
+  max_attendees: z.number().int().positive('Max attendees must be positive').optional().or(z.null()),
+});
 
 export interface Event {
   id: string;
@@ -28,6 +41,7 @@ export const useEvents = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const fetchAllEvents = async () => {
     try {
@@ -120,9 +134,21 @@ export const useEvents = () => {
     max_attendees?: number;
   }) => {
     try {
+      // Validate input data
+      const validationResult = eventSchema.safeParse(eventData);
+      if (!validationResult.success) {
+        const errorMessage = validationResult.error.errors[0].message;
+        toast({
+          title: "Validation Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return { data: null, error: errorMessage };
+      }
+
       const { data, error } = await supabase
         .from('events')
-        .insert([eventData])
+        .insert([validationResult.data as any])
         .select(`
           *,
           venues (
@@ -139,15 +165,34 @@ export const useEvents = () => {
       setEvents(prev => [...prev, data]);
       return { data, error: null };
     } catch (err) {
-      return { data: null, error: err instanceof Error ? err.message : 'Failed to create event' };
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create event';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      return { data: null, error: errorMessage };
     }
   };
 
   const updateEvent = async (eventId: string, updates: Partial<Event>) => {
     try {
+      // Validate update data (partial validation)
+      const updateSchema = eventSchema.partial();
+      const validationResult = updateSchema.safeParse(updates);
+      if (!validationResult.success) {
+        const errorMessage = validationResult.error.errors[0].message;
+        toast({
+          title: "Validation Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return { data: null, error: errorMessage };
+      }
+
       const { data, error } = await supabase
         .from('events')
-        .update(updates)
+        .update(validationResult.data as any)
         .eq('id', eventId)
         .select(`
           *,
@@ -165,7 +210,13 @@ export const useEvents = () => {
       setEvents(prev => prev.map(event => event.id === eventId ? data : event));
       return { data, error: null };
     } catch (err) {
-      return { data: null, error: err instanceof Error ? err.message : 'Failed to update event' };
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update event';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      return { data: null, error: errorMessage };
     }
   };
 
