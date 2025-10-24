@@ -13,10 +13,18 @@ interface Profile {
   updated_at: string;
 }
 
+interface UserRole {
+  id: string;
+  user_id: string;
+  role: 'venue_owner' | 'user';
+  created_at: string;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
+  userRoles: UserRole[];
   loading: boolean;
   isVenueOwner: boolean;
   signUp: (email: string, password: string, name: string, userType: 'venue' | 'club' | 'user', address: string) => Promise<{ error: any }>;
@@ -39,9 +47,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isVenueOwner, setIsVenueOwner] = useState(false);
   const { toast } = useToast();
+
+  // Check if user is a venue owner based on user_roles table
+  const isVenueOwner = userRoles.some(role => role.role === 'venue_owner');
 
   useEffect(() => {
     // Set up auth state listener
@@ -51,27 +62,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile
+          // Fetch user profile and roles
           setTimeout(async () => {
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .single();
-            setProfile(profileData as Profile);
+            const [profileResult, rolesResult] = await Promise.all([
+              supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .single(),
+              supabase
+                .from('user_roles')
+                .select('*')
+                .eq('user_id', session.user.id)
+            ]);
             
-            // Fetch user roles to determine if user is a venue owner
-            const { data: rolesData } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', session.user.id);
-            
-            const hasVenueOwnerRole = rolesData?.some(r => r.role === 'venue_owner') ?? false;
-            setIsVenueOwner(hasVenueOwnerRole);
+            setProfile(profileResult.data as Profile);
+            setUserRoles(rolesResult.data as UserRole[] || []);
           }, 0);
         } else {
           setProfile(null);
-          setIsVenueOwner(false);
+          setUserRoles([]);
         }
         
         setLoading(false);
@@ -92,12 +102,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .single(),
           supabase
             .from('user_roles')
-            .select('role')
+            .select('*')
             .eq('user_id', session.user.id)
-        ]).then(([{ data: profileData }, { data: rolesData }]) => {
-          setProfile(profileData as Profile);
-          const hasVenueOwnerRole = rolesData?.some(r => r.role === 'venue_owner') ?? false;
-          setIsVenueOwner(hasVenueOwnerRole);
+        ]).then(([profileResult, rolesResult]) => {
+          setProfile(profileResult.data as Profile);
+          setUserRoles(rolesResult.data as UserRole[] || []);
           setLoading(false);
         });
       } else {
@@ -109,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, name: string, userType: 'venue' | 'club' | 'user', address: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -121,6 +130,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
     });
+    
+    // After signup, insert the appropriate role
+    if (!error && data.user) {
+      const role = (userType === 'venue' || userType === 'club') ? 'venue_owner' : 'user';
+      await supabase.from('user_roles').insert({
+        user_id: data.user.id,
+        role: role
+      });
+    }
     
     if (error) {
       toast({
@@ -187,6 +205,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     profile,
+    userRoles,
     loading,
     isVenueOwner,
     signUp,
