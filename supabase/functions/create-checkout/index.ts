@@ -1,6 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+
+const checkoutSchema = z.object({
+  plan: z.string().trim().min(1, 'Plan name is required').max(50, 'Plan name too long').regex(/^[a-zA-Z0-9\s-]+$/, 'Invalid plan name format'),
+});
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,8 +44,12 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { plan } = await req.json();
-    if (!plan) throw new Error("Plan name is required");
+    const body = await req.json();
+    const validation = checkoutSchema.safeParse(body);
+    if (!validation.success) {
+      throw new Error(validation.error.errors[0].message);
+    }
+    const { plan } = validation.data;
     logStep("Plan requested", { plan });
 
     // Get plan details from database

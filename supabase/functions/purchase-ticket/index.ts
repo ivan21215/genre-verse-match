@@ -1,6 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+
+const purchaseSchema = z.object({
+  ticket_id: z.string().uuid('Invalid ticket ID'),
+  quantity: z.number().int('Quantity must be an integer').min(1, 'Quantity must be at least 1').max(100, 'Maximum 100 tickets per purchase'),
+});
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,8 +46,12 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { ticket_id, quantity = 1 } = await req.json();
-    if (!ticket_id) throw new Error("Ticket ID is required");
+    const body = await req.json();
+    const validation = purchaseSchema.safeParse(body);
+    if (!validation.success) {
+      throw new Error(validation.error.errors[0].message);
+    }
+    const { ticket_id, quantity } = validation.data;
     logStep("Ticket purchase requested", { ticket_id, quantity });
 
     // Get ticket details

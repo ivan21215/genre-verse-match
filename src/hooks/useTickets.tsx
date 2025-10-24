@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { z } from 'zod';
+
+const ticketSchema = z.object({
+  event_id: z.string().uuid('Invalid event ID'),
+  ticket_type: z.string().trim().min(1, 'Ticket type is required').max(100, 'Ticket type must be less than 100 characters'),
+  price: z.number().int('Price must be an integer').min(0, 'Price must be non-negative').max(1000000, 'Price exceeds maximum'),
+  quantity_available: z.number().int('Quantity must be an integer').min(0, 'Quantity must be non-negative').max(100000, 'Quantity exceeds maximum').optional(),
+});
 
 export interface EventTicket {
   id: string;
@@ -77,9 +85,16 @@ export const useTickets = () => {
     quantity_available?: number;
   }) => {
     try {
+      // Validate input data
+      const validation = ticketSchema.safeParse(ticketData);
+      if (!validation.success) {
+        const errorMessage = validation.error.errors[0].message;
+        return { data: null, error: errorMessage };
+      }
+
       const { data, error } = await supabase
         .from('event_tickets')
-        .insert([ticketData])
+        .insert([validation.data])
         .select()
         .single();
       

@@ -1,4 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+
+const genreSchema = z.object({
+  genre: z.string().trim().min(1, 'Genre is required').max(50, 'Genre too long').regex(/^[a-zA-Z0-9\s-]+$/, 'Invalid genre format'),
+});
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,14 +16,15 @@ serve(async (req) => {
   }
 
   try {
-    const { genre } = await req.json();
-    
-    if (!genre) {
+    const body = await req.json();
+    const validation = genreSchema.safeParse(body);
+    if (!validation.success) {
       return new Response(
-        JSON.stringify({ error: 'Genre is required' }),
+        JSON.stringify({ error: validation.error.errors[0].message }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    const { genre } = validation.data;
 
     const clientId = Deno.env.get('SPOTIFY_CLIENT_ID');
     const clientSecret = Deno.env.get('SPOTIFY_CLIENT_SECRET');
