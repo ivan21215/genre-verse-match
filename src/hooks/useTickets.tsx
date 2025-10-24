@@ -10,6 +10,12 @@ const ticketSchema = z.object({
   quantity_available: z.number().int('Quantity must be an integer').min(0, 'Quantity must be non-negative').max(100000, 'Quantity exceeds maximum').optional(),
 });
 
+const updateTicketSchema = z.object({
+  ticket_type: z.string().trim().min(1, 'Ticket type is required').max(100, 'Ticket type must be less than 100 characters').optional(),
+  price: z.number().int('Price must be an integer').min(0, 'Price must be non-negative').max(1000000, 'Price exceeds maximum').optional(),
+  quantity_available: z.number().int('Quantity must be an integer').min(0, 'Quantity must be non-negative').max(100000, 'Quantity exceeds maximum').optional(),
+}).strict();
+
 export interface EventTicket {
   id: string;
   event_id: string;
@@ -127,9 +133,16 @@ export const useTickets = () => {
 
   const updateTicket = async (ticketId: string, updates: Partial<EventTicket>) => {
     try {
+      // Validate update data
+      const validation = updateTicketSchema.safeParse(updates);
+      if (!validation.success) {
+        const errorMessage = validation.error.errors[0].message;
+        return { data: null, error: errorMessage };
+      }
+
       const { data, error } = await supabase
         .from('event_tickets')
-        .update(updates)
+        .update(validation.data)
         .eq('id', ticketId)
         .select()
         .single();
